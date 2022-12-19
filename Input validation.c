@@ -42,7 +42,7 @@ int input_validity(char puzzle[]){
 }
 
 int main(){
-    char puzzle[16] = "####AB1D****#*#*";
+    char puzzle[16] = "####AW1D****#*#*";
     int validation = input_validity(puzzle);
     return 0;
 }
