@@ -1,33 +1,25 @@
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
 #define SIZE 256
-#define FILES 3
-
-void getFile(int);
 
 int main(){
-    int fileCount;
+    char grid[SIZE][SIZE]={0},word[SIZE][SIZE]={0},line[SIZE];
+    int pointer = 0;
 
-    for (fileCount=1;fileCount<=FILES;fileCount++){
-        getFile(fileCount);
+    printf("Grid: \n");
+    while (scanf("%[^\n]%*c",line) != 0){
+        strcat(grid[pointer],line);
+        printf("%s\n",grid[pointer]);
+        pointer++;
+    }
+    scanf("%*c",line);
+    pointer = 0;
+    printf("Word: \n");
+    while (scanf("%[^\n]%*c",line) != 0){
+        strcat(word[pointer],line);
+        printf("%s\n",word[pointer]);
+        pointer++;
     }
     return 0;
-}
-
-void getFile(int i){
-    char puzzelFile[SIZE]="puzzel",wordFile[SIZE]="word",no[2];
-
-    itoa(i,no,10);
-
-    strcat(puzzelFile,no);
-    strcat(puzzelFile,".txt");
-
-    strcat(wordFile,no);
-    strcat(wordFile,".txt");
-    printf("Puzzle: %s\n",puzzelFile);
-    printf("Words:  %s\n",wordFile);
-
-    return;
 }
