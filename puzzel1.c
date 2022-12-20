@@ -73,5 +73,6 @@ int validate(){
     }
     while (len > 0);
 
+    row--;
     return 1;
 }
