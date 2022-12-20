@@ -103,11 +103,25 @@ int main(){
 
     int word_len = strlen(words[0]);
     int n = 0;
-    for (int i = 0; i < word_len; i++){
+    for (int i = 0; i < 4; i++){
         if (word_len == row_max[i]){
             n = i;
-            for (int j = 0; j < word_len; j++) {
-                puzzle_2d[n][j] = words[0][j];
+            for (int j = 0; j < 4; j++) {
+                if(puzzle_2d[n][j]== '#') puzzle_2d[n][j] = *words[0]++;
+            }
+    }
+
+    }
+    printf("\n%d\n",n);
+
+    //check each column
+    word_len = strlen(words[1]);
+    n =0;
+    for (int i = 0; i < 4; i++){
+        if (word_len == col_max[i]){
+            n = i;
+            for (int j = 0; j < 4; j++) {
+                if(puzzle_2d[j][n]== '#') puzzle_2d[j][n] = *words[1]++;
             }
     }
 
@@ -124,3 +138,4 @@ int main(){
     }
 
     return 0;
+}
