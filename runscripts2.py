@@ -1,6 +1,6 @@
 import subprocess
 
-FILE = 3
+FILE = 4
 
 def main():
     #for i in range(FILE):
@@ -15,9 +15,13 @@ def main():
         data = file.readlines()
         
         data = "".join(data)
-        #print(data)
+        print("Test Case",i+1,":")
+        print(data)
+        print("Output:")
         out = subprocess.run(["puzzel1.exe","-","-"],shell=True,input=data.encode())
+        print("Return Code:",out.returncode)
         print()
+        
         file.close()
 
 if __name__ == '__main__':
