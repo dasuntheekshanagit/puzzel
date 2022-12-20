@@ -50,9 +50,12 @@ int main(){
         *#**    *Y**
 
     */
-    char words[4][4] = {"GLUE", "FLY"};
+    char *words[4] = {"GLUE", "FLY"};
      // Declare the two-dimensional array
     char puzzle_2d[4][4];
+    //for (int i = 0; i < 2; i++) {
+      //  printf("%s\n", words[i]);
+    //}
 
     // Iterate over the elements of puzzle and assign them to the elements of words
     for (int i = 0; i < 4; i++) {
@@ -91,11 +94,33 @@ int main(){
     }
 
     // Print the results
-    printf("Number of # along the vertical axis: %d\n", vertical_count);
-    printf("Number of # along the horizontal axis: %d\n", horizontal_count);
-    printf("Maximum number of # in each row: %d %d %d %d\n", row_max[0], row_max[1], row_max[2], row_max[3]);
-    printf("Maximum number of # in each column: %d %d %d %d\n", col_max[0], col_max[1], col_max[2], col_max[3]);
+    //printf("Number of # along the vertical axis: %d\n", vertical_count);
+    //printf("Number of # along the horizontal axis: %d\n", horizontal_count);
+    //printf("Maximum number of # in each row: %d %d %d %d\n", row_max[0], row_max[1], row_max[2], row_max[3]);
+    //printf("Maximum number of # in each column: %d %d %d %d\n", col_max[0], col_max[1], col_max[2], col_max[3]);
+
+    //check each row
+
+    int word_len = strlen(words[0]);
+    int n = 0;
+    for (int i = 0; i < word_len; i++){
+        if (word_len == row_max[i]){
+            n = i;
+            for (int j = 0; j < word_len; j++) {
+                puzzle_2d[n][j] = words[0][j];
+            }
+    }
+
+    }
+    printf("\n%d\n",n);
+
+
+
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            printf("%c ", puzzle_2d[i][j]);
+        }
+        printf("\n");
+    }
 
     return 0;
-}
-
