@@ -9,7 +9,7 @@ int row,col,wordcount;
 
 typedef struct _{
     /*
-        This words ttpe has pointer and wordlist array. pointer indicate the last updated index of the wordlist.
+        This words type has pointer and wordlist array. pointer indicate the last updated index of the wordlist.
     */
     int pointer;
     char wordlist[SIZE][SIZE];
@@ -20,15 +20,17 @@ words wordList[SIZE]={0,{0}};
 void getInput();
 void getWordLength();
 int input_validity(char *,int);
+void printWords();
 int validate();
 
 int main(){
 
     getInput();
     int i = validate();
-    printf("%d %d\n",row,col);
-    printf("%d\n",wordcount);
+    //printf("%d %d\n",row,col);
+    //printf("%d\n",wordcount);
     getWordLength();
+    printWords();
     return 0;
 }
 
@@ -58,6 +60,22 @@ void getInput(){
     wordcount = pointer;
 
     return ;
+}
+
+void getWordLength(){
+    /*
+        This function itarate trough the word list and get length of words. The they are stored in words type array with corresponding length.
+        Ex: cat, dog, fish
+        wordlist = [0:[],0:[],0:[],2:['cat',''dog'],1:['fish']]
+    */
+    for (int i=0;i<wordcount;i++){
+        //printf("%s ",word[i]);
+        int len = strlen(word[i]);
+        int point = (wordList+len)->pointer;
+        (wordList+len)->pointer = point + 1;
+        strcpy((wordList+len)->wordlist[point],word[i]);
+    }
+    return;
 }
 
 int input_validity(char puzzle[],int len){
@@ -92,19 +110,13 @@ int validate(){
     return 1;
 }
 
-void getWordLength(){
-    /*
-        This function itarate trough the word list and get length of words. The they are stored in words type array with corresponding length.
-        Ex: cat, dog, fish
-        wordlist = [0:[],0:[],0:[],2:['cat',''dog'],1:['fish']]
-    */
-    for (int i=0;i<wordcount;i++){
-        //printf("%s ",word[i]);
-        int len = strlen(word[i]);
-        int point = (wordList+len)->pointer;
-        (wordList+len)->pointer = point + 1;
-        strcpy((wordList+len)->wordlist[point],word[i]);
-        printf("%p %d %s\n",wordList+len,(wordList+len)->pointer,(wordList+len)->wordlist[point-1]);
+void printWords(){
+    int i;
+    for (i=0;i<10;i++){
+        for (int j=0;j<(wordList+i)->pointer;j++){
+            printf("%s ",(wordList+i)->wordlist[j]);
+        }
+        printf("\n");
     }
     return;
 }
