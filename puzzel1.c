@@ -15,13 +15,23 @@ typedef struct _{
     char wordlist[SIZE][SIZE];
 }words;
 
-words wordList[SIZE]={0,{0}};
+typedef struct __{
+    int x;
+    int y;
+    int len;
+}blanks;
 
+words wordList[SIZE]={0,{0}};
+blanks rowBlank[SIZE];
+blanks colBlank[SIZE];
+
+_Bool checkHash(int,int,_Bool,int*,blanks *);
 void getInput();
 void getWordLength();
 int input_validity(char *,int);
 void printWords();
 int validate();
+void walkThroughGrid();
 
 int main(){
 
@@ -29,9 +39,35 @@ int main(){
     int i = validate();
     //printf("%d %d\n",row,col);
     //printf("%d\n",wordcount);
-    getWordLength();
-    printWords();
+    if (i){
+        getWordLength();
+        printWords();
+        walkThroughGrid();
+    }
     return 0;
+}
+
+_Bool checkHash(int i,int j,_Bool sts,int *Point,blanks* Blank){
+    int Pointer = *Point;
+    if (grid[i][j] == '#'){
+        if (sts){
+            (Blank+Pointer)->len = (Blank+Pointer)->len + 1;
+        }else{
+            (Blank+Pointer)->len = (Blank+Pointer)->len + 1;
+            (Blank+Pointer)->x = j;
+            (Blank+Pointer)->y = i;
+            sts = 1;
+        }
+    }else{
+        if (sts){
+            printf("x:%d y:%d len:%d\n",(Blank+Pointer)->x,(Blank+Pointer)->y,(Blank+Pointer)->len);
+            Pointer++;
+        }
+        sts = 0;
+        //len = 0;
+    }
+    *Point = Pointer;
+    return sts;
 }
 
 void getInput(){
@@ -117,6 +153,25 @@ void printWords(){
             printf("%s ",(wordList+i)->wordlist[j]);
         }
         printf("\n");
+    }
+    return;
+}
+
+void walkThroughGrid(){
+    _Bool rowsts = 0,colsts=0;
+    int len=0,rowPointer=0,colPointer=0;
+    for (int i=0;i<row;i++){
+        for (int j=0;j<col;j++){
+            rowsts = checkHash(i,j,rowsts,&rowPointer,&rowBlank[0]);
+            colsts = checkHash(j,i,colsts,&colPointer,&colBlank[0]);
+        }
+    }
+
+    if (grid[row-1][col-1] == '#'){
+        printf("x:%d y:%d len:%d\n",(rowBlank+rowPointer)->x,(rowBlank+rowPointer)->y,(rowBlank+rowPointer)->len);
+    }
+    if (grid[col-1][row-1] == '#'){
+        printf("x:%d y:%d len:%d\n",(colBlank+colPointer)->x,(colBlank+colPointer)->y,(colBlank+colPointer)->len);
     }
     return;
 }
