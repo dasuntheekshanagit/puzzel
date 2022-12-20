@@ -11,7 +11,7 @@ def main():
     
     for i in range(FILE):
         fileName = "puzzel"+ str(i+1)+".txt"
-        file = open(fileName,'r')
+        file = open("puzzels/"+fileName,'r')
         data = file.readlines()
         
         data = "".join(data)
