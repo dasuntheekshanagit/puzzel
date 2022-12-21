@@ -37,7 +37,7 @@ _Bool checkHash(int,int,_Bool,int*,blanks *,char);
 void getInput();
 void getWordLength();
 _Bool input_validity(char *,int);
-void matchWords();
+_Bool matchWords();
 void printWords();
 void printBlanks();
 _Bool validate();
@@ -46,16 +46,17 @@ void walkThroughGrid();
 int main(){
 
     getInput();
-    _Bool i = validate();
     //printf("%d %d\n",row,col);
     //printf("%d\n",wordcount);
-    if (i){
+    if (validate()){
         getWordLength();
         //printWords();
         walkThroughGrid();
         //printBlanks();
-        matchWords();
-        printBlanks();
+        if(matchWords()){
+            //printBlanks();
+            printf("Continue\n");
+        }
     }
     return 0;
 }
@@ -205,7 +206,7 @@ void walkThroughGrid(){
     return;
 }
 
-void matchWords(){
+_Bool matchWords(){
     int limit;
 
     if (rowPointer>colPointer){
@@ -238,6 +239,10 @@ void matchWords(){
         }
     }
 
-    printf("%d %d\n",rowAvalable,colAvalable);
-    return;
+    //printf("%d %d\n",rowAvalable,colAvalable);
+    if ((rowAvalable+colAvalable) < wordcount){
+        printf("IMPOSIBLE\n");
+        return 0;
+    }
+    return 1;
 }
