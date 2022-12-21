@@ -37,10 +37,10 @@ words wordList[SIZE];
 blanks rowBlank[SIZE];
 blanks colBlank[SIZE];
 
-void addToGridCol(int,int,char*,int);
-void addToGridRow(int,int,char*,int);
+_Bool addToGridCol(int,int,char*,int);
+_Bool addToGridRow(int,int,char*,int);
 _Bool checkHash(int,int,_Bool,int*,blanks *,char);
-void fillOnePossible(blanks *,int);
+_Bool fillOnePossible(blanks *,int);
 void getInput();
 void getWordLength();
 _Bool input_validity(char *,int);
@@ -64,9 +64,9 @@ int main(){
         if(matchWords()){
             //printBlanks();
             //printf("Continue\n");
-            fillOnePossible(&rowBlank[0],1);
-            fillOnePossible(&colBlank[0],0);
-            if (imposible>0){
+            _Bool y = fillOnePossible(&rowBlank[0],1);
+            _Bool x = fillOnePossible(&colBlank[0],0);
+            if ((imposible>0) & x & y){
                 printGrid();
             }else{
                 printf("IMPOSSIBLE\n");
@@ -76,18 +76,34 @@ int main(){
     return 0;
 }
 
-void addToGridCol(int x,int y,char match[],int len){
+_Bool addToGridCol(int x,int y,char match[],int len){
     for (int i=0;i<len;i++){
+        if (isalpha(grid[y+i][x])){
+            if (grid[y+i][x] == match[i]){
+                continue;
+            }else{
+                imposible = 100;
+                return 1;
+            }
+        }
         grid[y+i][x] = match[i];
     }
-    return;
+    return 0;
 }
 
-void addToGridRow(int x,int y,char match[],int len){
+_Bool addToGridRow(int x,int y,char match[],int len){
     for (int i=0;i<len;i++){
+        if (isalpha(grid[y][x+i])){
+            if (grid[y][x+i] == match[i]){
+                continue;
+            }else{
+                imposible = 100;
+                return 1;
+            }
+        }
         grid[y][x+i] = match[i];
     }
-    return;
+    return 0;
 }
 
 _Bool checkHash(int i,int j,_Bool sts,int *Point,blanks* Blank,char rc){
@@ -126,7 +142,7 @@ _Bool checkHash(int i,int j,_Bool sts,int *Point,blanks* Blank,char rc){
     return sts;
 }
 
-void fillOnePossible(blanks *Blank,int r){
+_Bool fillOnePossible(blanks *Blank,int r){
     int index;
     for (int i=0;i<SIZE;i++){
         //printf("%d\n",i);
@@ -137,9 +153,13 @@ void fillOnePossible(blanks *Blank,int r){
             //printf("x:%d y:%d word:%s\n",(Blank+i)->x,(Blank+i)->y,((Blank+i)->wordmatch)->match);
             if (avalable[index] == 0){
                 if (r == 1){
-                    addToGridRow((Blank+i)->x,(Blank+i)->y,((Blank+i)->wordmatch)->match,(Blank+i)->len);
+                    if (addToGridRow((Blank+i)->x,(Blank+i)->y,((Blank+i)->wordmatch)->match,(Blank+i)->len)){
+                        return 0;
+                    }
                 }else{
-                    addToGridCol((Blank+i)->x,(Blank+i)->y,((Blank+i)->wordmatch)->match,(Blank+i)->len);
+                    if (addToGridCol((Blank+i)->x,(Blank+i)->y,((Blank+i)->wordmatch)->match,(Blank+i)->len)){
+                        return 0;
+                    }
                 }
                 avalable[index] = 1;
             }else{
@@ -147,7 +167,7 @@ void fillOnePossible(blanks *Blank,int r){
             }
         }
     }
-    return;
+    return 1;
 }
 
 void getInput(){
