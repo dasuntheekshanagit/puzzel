@@ -5,8 +5,8 @@
 #define SIZE 256
 
 char grid[SIZE][SIZE]={0},word[SIZE][SIZE]={0};
-int row,col,wordcount,rowPointer=0,colPointer=0,colAvalable=0,rowAvalable=0;
-_Bool avalable[SIZE]={1};
+int row,col,wordcount,rowPointer=0,colPointer=0,colAvalable=0,rowAvalable=0,imposible=0;
+_Bool avalable[SIZE];
 
 
 typedef struct ___{
@@ -37,14 +37,17 @@ words wordList[SIZE];
 blanks rowBlank[SIZE];
 blanks colBlank[SIZE];
 
+void addToGridCol(int,int,char*,int);
+void addToGridRow(int,int,char*,int);
 _Bool checkHash(int,int,_Bool,int*,blanks *,char);
-void fillRows();
+void fillOnePossible(blanks *,int);
 void getInput();
 void getWordLength();
 _Bool input_validity(char *,int);
 _Bool matchWords();
-void printWords();
 void printBlanks();
+void printGrid();
+void printWords();
 _Bool validate();
 void walkThroughGrid();
 
@@ -60,10 +63,31 @@ int main(){
         //printBlanks();
         if(matchWords()){
             //printBlanks();
-            printf("Continue\n");
+            //printf("Continue\n");
+            fillOnePossible(&rowBlank[0],1);
+            fillOnePossible(&colBlank[0],0);
+            if (imposible>0){
+                printGrid();
+            }else{
+                printf("IMPOSSIBLE\n");
+            }
         }
     }
     return 0;
+}
+
+void addToGridCol(int x,int y,char match[],int len){
+    for (int i=0;i<len;i++){
+        grid[y+i][x] = match[i];
+    }
+    return;
+}
+
+void addToGridRow(int x,int y,char match[],int len){
+    for (int i=0;i<len;i++){
+        grid[y][x+i] = match[i];
+    }
+    return;
 }
 
 _Bool checkHash(int i,int j,_Bool sts,int *Point,blanks* Blank,char rc){
@@ -102,10 +126,29 @@ _Bool checkHash(int i,int j,_Bool sts,int *Point,blanks* Blank,char rc){
     return sts;
 }
 
-/*void fillRows(){
-    continue;
+void fillOnePossible(blanks *Blank,int r){
+    int index;
+    for (int i=0;i<SIZE;i++){
+        //printf("%d\n",i);
+        imposible = imposible+(Blank+i)->blankPointer;
+        if ((Blank+i)->blankPointer == 1){
+            index = ((Blank+i)->wordmatch)->index;
+            //printf("%d\n",avalable[index]);
+            //printf("x:%d y:%d word:%s\n",(Blank+i)->x,(Blank+i)->y,((Blank+i)->wordmatch)->match);
+            if (avalable[index] == 0){
+                if (r == 1){
+                    addToGridRow((Blank+i)->x,(Blank+i)->y,((Blank+i)->wordmatch)->match,(Blank+i)->len);
+                }else{
+                    addToGridCol((Blank+i)->x,(Blank+i)->y,((Blank+i)->wordmatch)->match,(Blank+i)->len);
+                }
+                avalable[index] = 1;
+            }else{
+                imposible = 0;
+            }
+        }
+    }
     return;
-}*/
+}
 
 void getInput(){
     char line[SIZE]= {0};
@@ -147,6 +190,7 @@ void getWordLength(){
         int point = (wordList+len)->pointer;
         (wordList+len)->pointer = point + 1;
         strcpy(((wordList+len)->wordlist[point]).match,word[i]);
+        ((wordList+len)->wordlist[point]).index = i;
     }
     return;
 }
@@ -183,11 +227,10 @@ _Bool validate(){
     return 1;
 }
 
-void printWords(){
-    int i;
-    for (i=0;i<10;i++){
-        for (int j=0;j<(wordList+i)->pointer;j++){
-            printf("%s ",((wordList+i)->wordlist[j]).match);
+void printGrid(){
+    for (int i=0;i<row;i++){
+        for (int j=0;j<col;j++){
+            printf("%c",grid[i][j]);
         }
         printf("\n");
     }
@@ -203,6 +246,17 @@ void printBlanks(){
     return;
 }
 
+void printWords(){
+    int i;
+    for (i=0;i<10;i++){
+        for (int j=0;j<(wordList+i)->pointer;j++){
+            printf("%s ",((wordList+i)->wordlist[j]).match);
+        }
+        printf("\n");
+    }
+    return;
+}
+
 void walkThroughGrid(){
     _Bool rowsts = 0,colsts=0;
     int len=0;
@@ -210,7 +264,7 @@ void walkThroughGrid(){
     for (int i=0;i<row;i++){
         for (int j=0;j<col;j++){
             rowsts = checkHash(i,j,rowsts,&rowPointer,&rowBlank[0],'c');
-            colsts = checkHash(j,i,colsts,&colPointer,&colBlank[0],row);
+            colsts = checkHash(j,i,colsts,&colPointer,&colBlank[0],'r');
         }
     }
     return;
