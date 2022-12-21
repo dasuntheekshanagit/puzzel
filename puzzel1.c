@@ -5,7 +5,7 @@
 #define SIZE 256
 
 char grid[SIZE][SIZE]={0},word[SIZE][SIZE]={0};
-int row,col,wordcount;
+int row,col,wordcount,rowPointer=0,colPointer=0,colAvalable=0,rowAvalable=0;
 
 typedef struct _{
     /*
@@ -15,11 +15,18 @@ typedef struct _{
     char wordlist[SIZE][SIZE];
 }words;
 
+typedef struct ___{
+    char match[SIZE];
+    int posibility;
+}matchwords;
+
 typedef struct __{
     int x;
     int y;
     int len;
-    char wordmatch[SIZE][SIZE];
+    int blankPointer;
+    //char wordmatch[SIZE][SIZE];
+    matchwords wordmatch[SIZE];
 }blanks;
 
 words wordList[SIZE]={0,{0}};
@@ -29,17 +36,17 @@ blanks colBlank[SIZE];
 _Bool checkHash(int,int,_Bool,int*,blanks *,char);
 void getInput();
 void getWordLength();
-int input_validity(char *,int);
+_Bool input_validity(char *,int);
 void matchWords();
 void printWords();
 void printBlanks();
-int validate();
+_Bool validate();
 void walkThroughGrid();
 
 int main(){
 
     getInput();
-    int i = validate();
+    _Bool i = validate();
     //printf("%d %d\n",row,col);
     //printf("%d\n",wordcount);
     if (i){
@@ -47,7 +54,8 @@ int main(){
         //printWords();
         walkThroughGrid();
         //printBlanks();
-        //matchWords();
+        matchWords();
+        printBlanks();
     }
     return 0;
 }
@@ -132,7 +140,7 @@ void getWordLength(){
     return;
 }
 
-int input_validity(char puzzle[],int len){
+_Bool input_validity(char puzzle[],int len){
     for(int j=0;j<len;j++){
             if (isalpha(puzzle[j]) || puzzle[j]=='#' || puzzle[j] == '*' ){
                 continue;
@@ -144,13 +152,13 @@ int input_validity(char puzzle[],int len){
         return 1;
 }
 
-int validate(){
+_Bool validate(){
     int len;
     col = strlen(grid[0]);
 
     do{
         len = strlen(grid[row]);
-        int sts = input_validity(grid[row],len);
+        _Bool sts = input_validity(grid[row],len);
         if (!sts){
             printf("INVALID INPUT\n");
             return sts;
@@ -178,14 +186,15 @@ void printWords(){
 void printBlanks(){
     int i;
     for (i=0;i<10;i++){
-        printf("%d ",(colBlank+i)->len);
+        //printf("x: %d y:%d len:%d pointer:%d\n",(colBlank+i)->x,(colBlank+i)->y,(colBlank+i)->len,(colBlank+i)->blankPointer);
+        printf("x: %d y:%d len:%d pointer:%d\n",(rowBlank+i)->x,(rowBlank+i)->y,(rowBlank+i)->len,(rowBlank+i)->blankPointer);
     }
     return;
 }
 
 void walkThroughGrid(){
     _Bool rowsts = 0,colsts=0;
-    int len=0,rowPointer=0,colPointer=0;
+    int len=0;
     //TODO: What if row and col are not equal?
     for (int i=0;i<row;i++){
         for (int j=0;j<col;j++){
@@ -193,33 +202,42 @@ void walkThroughGrid(){
             colsts = checkHash(j,i,colsts,&colPointer,&colBlank[0],row);
         }
     }
-
-    /*if (grid[row-1][col-1] == '#'){
-        printf("x:%d y:%d len:%d\n",(rowBlank+rowPointer)->x,(rowBlank+rowPointer)->y,(rowBlank+rowPointer)->len);
-    }*/
-    /*if (grid[col-1][row-1] == '#'){
-        printf("x:%d y:%d len:%d\n",(colBlank+colPointer)->x,(colBlank+colPointer)->y,(colBlank+colPointer)->len);
-    }*/
     return;
 }
 
 void matchWords(){
-    for (int i=0;i<6;i++){
+    int limit;
+
+    if (rowPointer>colPointer){
+        limit = rowPointer;
+    }else{
+        limit = colPointer;
+    }
+
+    for (int i=0;i<limit;i++){
         int rowlen = (rowBlank+i)->len,j;
         int collen = (colBlank+i)->len;
-        printf("row:%d col:%d\n",rowlen,collen);
+        //printf("row:%d col:%d\n",rowlen,collen);
         if (rowlen>1){
+            rowAvalable++;
             for (j=0;j<(wordList+rowlen)->pointer;j++){
                 printf("%d %s %d\n",rowlen,(wordList+rowlen)->wordlist[j],j);
-                strcpy((rowBlank+i)->wordmatch[j],(wordList+rowlen)->wordlist[j]);
+                strcpy(((rowBlank+i)->wordmatch[j]).match,(wordList+rowlen)->wordlist[j]);
             }
+            (rowBlank+i)->blankPointer = (wordList+rowlen)->pointer;
+            //printf("%d\n",(rowBlank+i)->balnkPointer);
         }
         if (collen>1){
+            colAvalable++;
             for (j=0;j<(wordList+collen)->pointer;j++){
                 printf("%d %s %d\n",collen,(wordList+collen)->wordlist[j],j);
-                strcpy((colBlank+i)->wordmatch[j],(wordList+collen)->wordlist[j]);
+                strcpy(((colBlank+i)->wordmatch[j]).match,(wordList+collen)->wordlist[j]);
             }
+            (colBlank+i)->blankPointer =(wordList+collen)->pointer;
+            //printf("%d\n",(colBlank+i)->balnkPointer);
         }
     }
+
+    printf("%d %d\n",rowAvalable,colAvalable);
     return;
 }
