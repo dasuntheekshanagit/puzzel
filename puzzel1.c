@@ -26,12 +26,13 @@ words wordList[SIZE]={0,{0}};
 blanks rowBlank[SIZE];
 blanks colBlank[SIZE];
 
-_Bool checkHash(int,int,_Bool,int*,blanks *);
+_Bool checkHash(int,int,_Bool,int*,blanks *,char);
 void getInput();
 void getWordLength();
 int input_validity(char *,int);
 void matchWords();
 void printWords();
+void printBlanks();
 int validate();
 void walkThroughGrid();
 
@@ -45,12 +46,13 @@ int main(){
         getWordLength();
         //printWords();
         walkThroughGrid();
-        matchWords();
+        //printBlanks();
+        //matchWords();
     }
     return 0;
 }
 
-_Bool checkHash(int i,int j,_Bool sts,int *Point,blanks* Blank){
+_Bool checkHash(int i,int j,_Bool sts,int *Point,blanks* Blank,char rc){
     int Pointer = *Point;
     if (grid[i][j] == '#'){
         if (sts){
@@ -61,15 +63,28 @@ _Bool checkHash(int i,int j,_Bool sts,int *Point,blanks* Blank){
             (Blank+Pointer)->y = i;
             sts = 1;
         }
+        //printf("%d %d\n",i,j);
+        //TODO: Check col or row when they are not equal
+        if (((j+1)== row) & (rc == 'c')) {
+            //printf("--x:%d y:%d len:%d %d\n",(Blank+Pointer)->x,(Blank+Pointer)->y,(Blank+Pointer)->len,Pointer);
+            sts = 0;
+            Pointer++;
+        }
+        if (((i+1)== col) & (rc == 'r')) {
+            //printf("--x:%d y:%d len:%d %d\n",(Blank+Pointer)->x,(Blank+Pointer)->y,(Blank+Pointer)->len,Pointer);
+            sts = 0;
+            Pointer++;
+        }
     }else{
         if (sts){
-            //printf("x:%d y:%d len:%d\n",(Blank+Pointer)->x,(Blank+Pointer)->y,(Blank+Pointer)->len);
+            //printf("x:%d y:%d len:%d %d\n",(Blank+Pointer)->x,(Blank+Pointer)->y,(Blank+Pointer)->len,Pointer);
             Pointer++;
         }
         sts = 0;
         //len = 0;
     }
     *Point = Pointer;
+    //printf("%d\n",*Point);
     return sts;
 }
 
@@ -160,38 +175,48 @@ void printWords(){
     return;
 }
 
+void printBlanks(){
+    int i;
+    for (i=0;i<10;i++){
+        printf("%d ",(colBlank+i)->len);
+    }
+    return;
+}
+
 void walkThroughGrid(){
     _Bool rowsts = 0,colsts=0;
     int len=0,rowPointer=0,colPointer=0;
+    //TODO: What if row and col are not equal?
     for (int i=0;i<row;i++){
         for (int j=0;j<col;j++){
-            rowsts = checkHash(i,j,rowsts,&rowPointer,&rowBlank[0]);
-            colsts = checkHash(j,i,colsts,&colPointer,&colBlank[0]);
+            rowsts = checkHash(i,j,rowsts,&rowPointer,&rowBlank[0],'c');
+            colsts = checkHash(j,i,colsts,&colPointer,&colBlank[0],row);
         }
     }
 
     /*if (grid[row-1][col-1] == '#'){
         printf("x:%d y:%d len:%d\n",(rowBlank+rowPointer)->x,(rowBlank+rowPointer)->y,(rowBlank+rowPointer)->len);
-    }
-    if (grid[col-1][row-1] == '#'){
+    }*/
+    /*if (grid[col-1][row-1] == '#'){
         printf("x:%d y:%d len:%d\n",(colBlank+colPointer)->x,(colBlank+colPointer)->y,(colBlank+colPointer)->len);
     }*/
     return;
 }
 
 void matchWords(){
-    for (int i=0;i<SIZE;i++){
-        int rowlen = (rowBlank+i)->len;
+    for (int i=0;i<6;i++){
+        int rowlen = (rowBlank+i)->len,j;
         int collen = (colBlank+i)->len;
+        printf("row:%d col:%d\n",rowlen,collen);
         if (rowlen>1){
-            for (int j=0;j<(wordList+rowlen)->pointer;j++){
-                printf("%d %s\n",rowlen,(wordList+rowlen)->wordlist[j]);
+            for (j=0;j<(wordList+rowlen)->pointer;j++){
+                printf("%d %s %d\n",rowlen,(wordList+rowlen)->wordlist[j],j);
                 strcpy((rowBlank+i)->wordmatch[j],(wordList+rowlen)->wordlist[j]);
             }
         }
         if (collen>1){
-            for (int j=0;j<(wordList+collen)->pointer;j++){
-                printf("%d %s\n",collen,(wordList+collen)->wordlist[j]);
+            for (j=0;j<(wordList+collen)->pointer;j++){
+                printf("%d %s %d\n",collen,(wordList+collen)->wordlist[j],j);
                 strcpy((colBlank+i)->wordmatch[j],(wordList+collen)->wordlist[j]);
             }
         }
