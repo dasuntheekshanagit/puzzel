@@ -108,7 +108,7 @@ _Bool addToGridRow(int x,int y,char match[],int len){
 
 _Bool checkHash(int i,int j,_Bool sts,int *Point,blanks* Blank,char rc){
     int Pointer = *Point;
-    if (grid[i][j] == '#'){
+    if (grid[i][j] == '#' | isalpha(grid[i][j])){
         if (sts){
             (Blank+Pointer)->len = (Blank+Pointer)->len + 1;
         }else{
