@@ -6,19 +6,23 @@
 
 char grid[SIZE][SIZE]={0},word[SIZE][SIZE]={0};
 int row,col,wordcount,rowPointer=0,colPointer=0,colAvalable=0,rowAvalable=0;
+_Bool avalable[SIZE]={1};
+
+
+typedef struct ___{
+    char match[SIZE];
+    int index;
+    int posibility;
+}matchwords;
 
 typedef struct _{
     /*
         This words type has pointer and wordlist array. pointer indicate the last updated index of the wordlist.
     */
     int pointer;
-    char wordlist[SIZE][SIZE];
+    //char wordlist[SIZE][SIZE];
+    matchwords wordlist[SIZE];
 }words;
-
-typedef struct ___{
-    char match[SIZE];
-    int posibility;
-}matchwords;
 
 typedef struct __{
     int x;
@@ -29,11 +33,12 @@ typedef struct __{
     matchwords wordmatch[SIZE];
 }blanks;
 
-words wordList[SIZE]={0,{0}};
+words wordList[SIZE];
 blanks rowBlank[SIZE];
 blanks colBlank[SIZE];
 
 _Bool checkHash(int,int,_Bool,int*,blanks *,char);
+void fillRows();
 void getInput();
 void getWordLength();
 _Bool input_validity(char *,int);
@@ -97,6 +102,11 @@ _Bool checkHash(int i,int j,_Bool sts,int *Point,blanks* Blank,char rc){
     return sts;
 }
 
+/*void fillRows(){
+    continue;
+    return;
+}*/
+
 void getInput(){
     char line[SIZE]= {0};
     int pointer = 0;
@@ -136,7 +146,7 @@ void getWordLength(){
         int len = strlen(word[i]);
         int point = (wordList+len)->pointer;
         (wordList+len)->pointer = point + 1;
-        strcpy((wordList+len)->wordlist[point],word[i]);
+        strcpy(((wordList+len)->wordlist[point]).match,word[i]);
     }
     return;
 }
@@ -177,7 +187,7 @@ void printWords(){
     int i;
     for (i=0;i<10;i++){
         for (int j=0;j<(wordList+i)->pointer;j++){
-            printf("%s ",(wordList+i)->wordlist[j]);
+            printf("%s ",((wordList+i)->wordlist[j]).match);
         }
         printf("\n");
     }
@@ -221,19 +231,21 @@ _Bool matchWords(){
         //printf("row:%d col:%d\n",rowlen,collen);
         if (rowlen>1){
             rowAvalable++;
-            for (j=0;j<(wordList+rowlen)->pointer;j++){
-                printf("%d %s %d\n",rowlen,(wordList+rowlen)->wordlist[j],j);
-                strcpy(((rowBlank+i)->wordmatch[j]).match,(wordList+rowlen)->wordlist[j]);
-            }
+            //for (j=0;j<(wordList+rowlen)->pointer;j++){
+                //printf("%d %s %d\n",rowlen,(wordList+rowlen)->wordlist[j],j);
+                //strcpy(((rowBlank+i)->wordmatch[j]).match,(wordList+rowlen)->wordlist[j]);
+            memcpy((rowBlank+i)->wordmatch,(wordList+rowlen)->wordlist,sizeof((wordList+rowlen)->wordlist));
+            //}
             (rowBlank+i)->blankPointer = (wordList+rowlen)->pointer;
             //printf("%d\n",(rowBlank+i)->balnkPointer);
         }
         if (collen>1){
             colAvalable++;
-            for (j=0;j<(wordList+collen)->pointer;j++){
-                printf("%d %s %d\n",collen,(wordList+collen)->wordlist[j],j);
-                strcpy(((colBlank+i)->wordmatch[j]).match,(wordList+collen)->wordlist[j]);
-            }
+            //for (j=0;j<(wordList+collen)->pointer;j++){
+                //printf("%d %s %d\n",collen,(wordList+collen)->wordlist[j],j);
+                //strcpy(((colBlank+i)->wordmatch[j]).match,(wordList+collen)->wordlist[j]);
+            memcpy((colBlank+i)->wordmatch,(wordList+collen)->wordlist,sizeof((wordList+rowlen)->wordlist));
+            //}
             (colBlank+i)->blankPointer =(wordList+collen)->pointer;
             //printf("%d\n",(colBlank+i)->balnkPointer);
         }
