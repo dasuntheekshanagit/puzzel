@@ -19,6 +19,7 @@ typedef struct __{
     int x;
     int y;
     int len;
+    char wordmatch[SIZE][SIZE];
 }blanks;
 
 words wordList[SIZE]={0,{0}};
@@ -29,6 +30,7 @@ _Bool checkHash(int,int,_Bool,int*,blanks *);
 void getInput();
 void getWordLength();
 int input_validity(char *,int);
+void matchWords();
 void printWords();
 int validate();
 void walkThroughGrid();
@@ -41,8 +43,9 @@ int main(){
     //printf("%d\n",wordcount);
     if (i){
         getWordLength();
-        printWords();
+        //printWords();
         walkThroughGrid();
+        matchWords();
     }
     return 0;
 }
@@ -60,7 +63,7 @@ _Bool checkHash(int i,int j,_Bool sts,int *Point,blanks* Blank){
         }
     }else{
         if (sts){
-            printf("x:%d y:%d len:%d\n",(Blank+Pointer)->x,(Blank+Pointer)->y,(Blank+Pointer)->len);
+            //printf("x:%d y:%d len:%d\n",(Blank+Pointer)->x,(Blank+Pointer)->y,(Blank+Pointer)->len);
             Pointer++;
         }
         sts = 0;
@@ -167,11 +170,31 @@ void walkThroughGrid(){
         }
     }
 
-    if (grid[row-1][col-1] == '#'){
+    /*if (grid[row-1][col-1] == '#'){
         printf("x:%d y:%d len:%d\n",(rowBlank+rowPointer)->x,(rowBlank+rowPointer)->y,(rowBlank+rowPointer)->len);
     }
     if (grid[col-1][row-1] == '#'){
         printf("x:%d y:%d len:%d\n",(colBlank+colPointer)->x,(colBlank+colPointer)->y,(colBlank+colPointer)->len);
+    }*/
+    return;
+}
+
+void matchWords(){
+    for (int i=0;i<SIZE;i++){
+        int rowlen = (rowBlank+i)->len;
+        int collen = (colBlank+i)->len;
+        if (rowlen>1){
+            for (int j=0;j<(wordList+rowlen)->pointer;j++){
+                printf("%d %s\n",rowlen,(wordList+rowlen)->wordlist[j]);
+                strcpy((rowBlank+i)->wordmatch[j],(wordList+rowlen)->wordlist[j]);
+            }
+        }
+        if (collen>1){
+            for (int j=0;j<(wordList+collen)->pointer;j++){
+                printf("%d %s\n",collen,(wordList+collen)->wordlist[j]);
+                strcpy((colBlank+i)->wordmatch[j],(wordList+collen)->wordlist[j]);
+            }
+        }
     }
     return;
 }
