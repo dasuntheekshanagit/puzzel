@@ -239,9 +239,9 @@ _Bool matchWords(){
         }
     }
 
-    //printf("%d %d\n",rowAvalable,colAvalable);
+    //printf("%d %d %d\n",rowAvalable,colAvalable,wordcount);
     if ((rowAvalable+colAvalable) < wordcount){
-        printf("IMPOSIBLE\n");
+        printf("IMPOSSIBLE\n");
         return 0;
     }
     return 1;
