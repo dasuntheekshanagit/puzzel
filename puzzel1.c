@@ -91,11 +91,18 @@ int main(){
             }*/
             increaseProbability(&rowBlank[0],1);
             increaseProbability(&colBlank[0],0);
+            int i = 0;
             while (rowAvalable+colAvalable){
+                printGrid();
+                printf("\n");
+                if (i>10){
+                    break;
+                }
                 _Bool y = fillOnePossible(&rowBlank[0],1);
                 _Bool x = fillOnePossible(&colBlank[0],0);
                 increaseProbability(&rowBlank[0],1);
                 increaseProbability(&colBlank[0],0);
+                i++;
             }
             printGrid();
         }
