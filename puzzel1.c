@@ -89,13 +89,23 @@ int main(){
             /*if ((rowAvalable+colAvalable)<1){
                     return 0;
             }*/
+            //printGrid();
+            //printBlanks();
+            //printf("fil\n");
             increaseProbability(&rowBlank[0],1);
+            //printBlanks();
+            //printf("row\n");
             increaseProbability(&colBlank[0],0);
+            //printGrid();
+            //printBlanks();
+            //printf("prob--\n");
             int i = 0;
             while (rowAvalable+colAvalable){
+                //printf("%d\n",rowAvalable+colAvalable);
                 printGrid();
-                printf("\n");
-                if (i>10){
+                printBlanks();
+                //printf("\n%d\n",i);
+                if (i>15){
                     break;
                 }
                 _Bool y = fillOnePossible(&rowBlank[0],1);
@@ -105,6 +115,7 @@ int main(){
                 i++;
             }
             printGrid();
+            printf("%d %d\n",i,rowAvalable+colAvalable);
         }
     }
     return 0;
@@ -245,6 +256,7 @@ _Bool checkHash(int i,int j,_Bool sts,int *Point,blanks* Blank,char rc){
 void deleteElement(int i,matchwords *arr){
     for (int j=i;j<5;j++){
         //TODO: Find another way to do this.
+        //printf("--%s\n",((arr+j)->match));
         strcpy(((arr+j)->match), ((arr+j+1)->match));
         (arr+j)->index = (arr+j+1)->index;
         (arr+j)->possibility = (arr+j+1)->possibility;
@@ -267,6 +279,7 @@ int findCharacter(int x,int y,int len,int rc,char text[]){
             if (c==text[i]){
                 possibility += (100/len);
             }else{
+                //printf("-1 (%d %d)%s",x,y,text);
                 return -1;
             }
         }
@@ -388,17 +401,31 @@ _Bool input_validity(char puzzle[],int len){
 }
 
 _Bool increaseProbability(blanks *Blank, int r){
+    int c=10;
     for (int i=0;i<SIZE;i++){
         int pointer = (Blank+i)->blankPointer;
         if (pointer>1){
             for (int j=0;j<pointer;j++){
                 int possibility = (((Blank+i)->wordmatch)+j)->possibility;
                 //TODO: If possibility > 90 get that value and stop oteration.
-                int c = findCharacter((Blank+i)->x,(Blank+i)->y,(Blank+i)->len,r, (((Blank+i)->wordmatch)+j)->match);
-                //printf("%d %p %d %p\n",c,(Blank+i)->wordmatch,i,(Blank+i)->wordmatch+1);
-                if (c<0){
+                int index = (((Blank+i)->wordmatch)+j)->index;
+                /*if (available[index]){
+                    printf("--%d %s",pointer,(((Blank+i)->wordmatch)+j)->match);
                     (Blank+i)->blankPointer -=1;
                     deleteElement(j,(Blank+i)->wordmatch);
+                //}else{*/
+                    if (strlen((((Blank+i)->wordmatch)+j)->match)>0){
+                        c = findCharacter((Blank+i)->x,(Blank+i)->y,(Blank+i)->len,r, (((Blank+i)->wordmatch)+j)->match);
+                    }
+                //}
+                //printf("%d %p %d %p\n",c,(Blank+i)->wordmatch,i,(Blank+i)->wordmatch+1);
+                if (c<0){
+                    //printf("before: %d ",(Blank+i)->blankPointer);
+                    (Blank+i)->blankPointer -=1;
+                    //printf("after: %d ",(Blank+i)->blankPointer);
+                    deleteElement(j,(Blank+i)->wordmatch);
+                    c = 10;
+                    //printf("delete %d \n",(Blank+i)->blankPointer);
                 }
             }
         }
@@ -455,8 +482,8 @@ void printBlanks(){
     */
 
     int i;
-    for (i=0;i<10;i++){                                           // Note: 10 is just to get first 10 elements. Its can be changed.
-        printf("x: %d y:%d len:%d pointer:%d\n",(colBlank+i)->x,(colBlank+i)->y,(colBlank+i)->len,(colBlank+i)->blankPointer);
+    for (i=0;i<20;i++){                                           // Note: 10 is just to get first 10 elements. Its can be changed.
+        //printf("x: %d y:%d len:%d pointer:%d\n",(colBlank+i)->x,(colBlank+i)->y,(colBlank+i)->len,(colBlank+i)->blankPointer);
         printf("x: %d y:%d len:%d pointer:%d\n",(rowBlank+i)->x,(rowBlank+i)->y,(rowBlank+i)->len,(rowBlank+i)->blankPointer);
     }
     return;
