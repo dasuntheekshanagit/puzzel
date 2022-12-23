@@ -128,7 +128,7 @@ _Bool addToGrid(int x,int y,char match[],int len,int rc){
     char check;
 
     for (int i=0;i<len;i++){
-        if (rc){
+        /*if (rc){
             check = grid[y][x+i]; // Row
         }else{
             check = grid[y+i][x]; //Col
@@ -142,7 +142,7 @@ _Bool addToGrid(int x,int y,char match[],int len,int rc){
                 impossible = 100;
                 return 1;
             }
-        }
+        }*/
         if (rc){
             grid[y][x+i] = match[i]; // Row
         }else{
@@ -187,6 +187,7 @@ _Bool checkToGrid(int x,int y,char match[],int len,int rc){
             }
         }
     }
+    addToGrid(x,y,match,len,rc);
     //printf("\n");
     return 0;
 }
@@ -290,23 +291,23 @@ _Bool fillOnePossible(blanks *Blank,int r){
         if ((Blank+i)->blankPointer == 1){                                // matches for the hole grid this will be 0.
             index = ((Blank+i)->wordmatch)->index;                        // If there is only one match
             if (available[index] == 0){                                   // and that word is not used by other blank to fill
-                if (r == 1){                                              // fill that word in the blank for the grid.
-                    if (addToGrid((Blank+i)->x,(Blank+i)->y,((Blank+i)->wordmatch)->match,(Blank+i)->len,1)){
+                //if (r == 1){                                              // fill that word in the blank for the grid.
+                    if (checkToGrid((Blank+i)->x,(Blank+i)->y,((Blank+i)->wordmatch)->match,(Blank+i)->len,r)){
                         ((Blank+i)->wordmatch)->possibility = 100;        // Indicate that blank is filled with best match
                         return 0;                                         // If successfully filled that blank without conflict return 0.
                     }
                     available[index] = 1;
                     rowAvalable-=1;
                     //printf("--%d\n",rowAvalable);                             // Indicated that word is used to filled and no longer available.
-                }else{
-                    if (addToGrid((Blank+i)->x,(Blank+i)->y,((Blank+i)->wordmatch)->match,(Blank+i)->len,0)){
+                /*}else{
+                    if (checkToGrid((Blank+i)->x,(Blank+i)->y,((Blank+i)->wordmatch)->match,(Blank+i)->len,0)){
                         ((Blank+i)->wordmatch)->possibility = 100;
                         return 0;
                     }
                     available[index] = 1;
                     colAvalable-=1;
                     //printf("--%d\n",rowAvalable);
-                }
+                }*/
                 // Note: Tow lines are moved to 212-213 and 218-219.
             }else{
                 //TODO: impossible = 0; is removed. Check whether its affected to further modifications.
