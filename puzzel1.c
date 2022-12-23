@@ -76,7 +76,7 @@ int main(){
         walkThroughGrid();
         //printBlanks();
         if(matchWords()){
-            //printBlanks();
+             //printBlanks();
             _Bool y = fillOnePossible(&rowBlank[0],1);
             _Bool x = fillOnePossible(&colBlank[0],0);
             if (!((impossible>0) & x & y)){                 // Check whether grid can fill or not.
@@ -202,12 +202,12 @@ _Bool checkHash(int i,int j,_Bool sts,int *Point,blanks* Blank,char rc){
         }
 
         // TODO: Check col or row when they are not equal.
-        // TODO: check r and c are correct.
-        if (((j+1)== row) & (rc == 'c')) {               // Check whether is it the last position of the row.
+        // TODO: check r and c are correct.   Note: Corrected it by changing row and col
+        if (((j+1)== col) & (rc == 'c')) {               // Check whether is it the last position of the row.
             sts = 0;
             Pointer++;                                   // If it is move the pointer to next position and break the counting.
         }
-        if (((i+1)== col) & (rc == 'r')) {               // Check whether is it the last position of the col.
+        if (((i+1)== row) & (rc == 'r')) {               // Check whether is it the last position of the col.
             sts = 0;
             Pointer++;                                   // If it is move the pointer to next position and break the counting.
         }
@@ -340,6 +340,7 @@ void getWordLength(){
         int len = strlen(word[i]);                                // get length
         int point = (wordList+len)->pointer;
         (wordList+len)->pointer = point + 1;                      // Increase the pointer always when adding a new word.
+        //printf("%d\n",(wordList+len)->pointer);  //Note: Word pointer
         strcpy(((wordList+len)->wordlist[point]).match,word[i]);
         ((wordList+len)->wordlist[point]).index = i;              // Store the index of the word in the matchword object.
     }
@@ -437,7 +438,7 @@ void printBlanks(){
 
     int i;
     for (i=0;i<10;i++){                                           // Note: 10 is just to get first 10 elements. Its can be changed.
-        //printf("x: %d y:%d len:%d pointer:%d\n",(colBlank+i)->x,(colBlank+i)->y,(colBlank+i)->len,(colBlank+i)->blankPointer);
+        printf("x: %d y:%d len:%d pointer:%d\n",(colBlank+i)->x,(colBlank+i)->y,(colBlank+i)->len,(colBlank+i)->blankPointer);
         printf("x: %d y:%d len:%d pointer:%d\n",(rowBlank+i)->x,(rowBlank+i)->y,(rowBlank+i)->len,(rowBlank+i)->blankPointer);
     }
     return;
@@ -465,10 +466,19 @@ void walkThroughGrid(){
             Iterate through grid and get the length of blanks and their position.
     */
 
-    _Bool rowsts = 0,colsts=0;                                          // Store the status of the function return.
+    _Bool rowsts = 0,colsts=0;                         // Store the status of the function return.
+    int iterate;
+
+    if (row>=col){
+        iterate = row;
+        //printf("row--%d %d",row,col);
+    }else{
+        iterate = col;
+        //printf("col-%d %d",row,col);
+    }
 
     //TODO: What if row and col are not equal?
-    for (int i=0;i<row;i++){
+    for (int i=0;i<iterate;i++){
         for (int j=0;j<col;j++){
             rowsts = checkHash(i,j,rowsts,&rowPointer,&rowBlank[0],'c');
             colsts = checkHash(j,i,colsts,&colPointer,&colBlank[0],'r');
