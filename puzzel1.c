@@ -47,8 +47,8 @@ words wordList[SIZE];  // word array. This is used to store words that have simi
 blanks rowBlank[SIZE]; // blanks array. This is used to store row blanks with its details.
 blanks colBlank[SIZE]; // blanks array. This is used to store column blanks with its details.
 
-_Bool addToGridCol(int,int,char*,int);             // Used to add the words to grid column wise.
-_Bool addToGridRow(int,int,char*,int);             // Used to add the words to grid row wise.
+_Bool addToGrid(int,int,char*,int,int);             // Used to add the words to grid column wise.
+_Bool checkToGrid(int,int,char*,int,int);             // Used to add the words to grid row wise.
 _Bool checkHash(int,int,_Bool,int*,blanks *,char); // Used to get length of blanks with its position.
 void deleteElement(int,matchwords*);
 int findCharacter(int,int,int,int,char*);
@@ -111,7 +111,7 @@ int main(){
 }
 
 //TODO: both functions can merge with rc value.
-_Bool addToGridCol(int x,int y,char match[],int len){
+_Bool addToGrid(int x,int y,char match[],int len,int rc){
     /*
         Input:
             x    : column no.
@@ -125,10 +125,17 @@ _Bool addToGridCol(int x,int y,char match[],int len){
             the words character that fill to that position return 1, else return 1.
     */
     //printf("%d %d %d %s\n",x,y,len,match);
+    char check;
+
     for (int i=0;i<len;i++){
+        if (rc){
+            check = grid[y][x+i]; // Row
+        }else{
+            check = grid[y+i][x]; //Col
+        }
         //printf("%c-%d ",grid[y+i][x],i);
-        if (isalpha(grid[y+i][x])){
-            if (grid[y+i][x] == match[i]){
+        if (isalpha(check)){
+            if (check == match[i]){
                 continue;
             }else{
                 //printf("----%c %c-----\n",grid[y+i][x],match[i]);
@@ -136,13 +143,18 @@ _Bool addToGridCol(int x,int y,char match[],int len){
                 return 1;
             }
         }
-        grid[y+i][x] = match[i];
+        if (rc){
+            grid[y][x+i] = match[i]; // Row
+        }else{
+            grid[y+i][x] = match[i]; // Col
+        }
+
     }
     //printf("\n");
     return 0;
 }
 
-_Bool addToGridRow(int x,int y,char match[],int len){
+_Bool checkToGrid(int x,int y,char match[],int len,int rc){
     /*
         Input:
             x    : column no.
@@ -156,19 +168,24 @@ _Bool addToGridRow(int x,int y,char match[],int len){
             the words character that fill to that position return 1, else return 1.
     */
     //printf("%d %d %d %s\n",x,y,len,match);
+    char check;
+
     for (int i=0;i<len;i++){
-        //printf("%c-%d ",grid[y][x+i],i);
-        if (isalpha(grid[y][x+i])){
-            if (grid[y][x+i] == match[i]){
+        if (rc){
+            check = grid[y][x+i]; // Row
+        }else{
+            check = grid[y+i][x]; //Col
+        }
+        //printf("%c-%d ",grid[y+i][x],i);
+        if (isalpha(check)){
+            if (check == match[i]){
                 continue;
             }else{
-                //printf("oihhgg\n");
+                //printf("----%c %c-----\n",grid[y+i][x],match[i]);
                 impossible = 100;
                 return 1;
             }
         }
-
-        grid[y][x+i] = match[i];
     }
     //printf("\n");
     return 0;
@@ -274,7 +291,7 @@ _Bool fillOnePossible(blanks *Blank,int r){
             index = ((Blank+i)->wordmatch)->index;                        // If there is only one match
             if (available[index] == 0){                                   // and that word is not used by other blank to fill
                 if (r == 1){                                              // fill that word in the blank for the grid.
-                    if (addToGridRow((Blank+i)->x,(Blank+i)->y,((Blank+i)->wordmatch)->match,(Blank+i)->len)){
+                    if (addToGrid((Blank+i)->x,(Blank+i)->y,((Blank+i)->wordmatch)->match,(Blank+i)->len,1)){
                         ((Blank+i)->wordmatch)->possibility = 100;        // Indicate that blank is filled with best match
                         return 0;                                         // If successfully filled that blank without conflict return 0.
                     }
@@ -282,7 +299,7 @@ _Bool fillOnePossible(blanks *Blank,int r){
                     rowAvalable-=1;
                     //printf("--%d\n",rowAvalable);                             // Indicated that word is used to filled and no longer available.
                 }else{
-                    if (addToGridCol((Blank+i)->x,(Blank+i)->y,((Blank+i)->wordmatch)->match,(Blank+i)->len)){
+                    if (addToGrid((Blank+i)->x,(Blank+i)->y,((Blank+i)->wordmatch)->match,(Blank+i)->len,0)){
                         ((Blank+i)->wordmatch)->possibility = 100;
                         return 0;
                     }
