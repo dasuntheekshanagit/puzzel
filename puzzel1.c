@@ -102,8 +102,8 @@ int main(){
             int i = 0;
             while (rowAvalable+colAvalable){
                 //printf("%d\n",rowAvalable+colAvalable);
-                printGrid();
-                printBlanks();
+                //printGrid();
+                //printBlanks();
                 //printf("\n%d\n",i);
                 if (i>15){
                     break;
@@ -409,11 +409,18 @@ _Bool increaseProbability(blanks *Blank, int r){
                 int possibility = (((Blank+i)->wordmatch)+j)->possibility;
                 //TODO: If possibility > 90 get that value and stop oteration.
                 int index = (((Blank+i)->wordmatch)+j)->index;
-                /*if (available[index]){
-                    printf("--%d %s",pointer,(((Blank+i)->wordmatch)+j)->match);
+               if (available[index]==1){
+                    //printf("--%d %s\n",pointer,(((Blank+i)->wordmatch)+j)->match);
+                     //printf("--%d %s\n",pointer,(((Blank+i)->wordmatch)+j+1)->match);
+                     strcpy((((Blank+i)->wordmatch)+j)->match, (((Blank+i)->wordmatch)+j+1)->match);
+                    (((Blank+i)->wordmatch)+j)->index = (((Blank+i)->wordmatch)+j+1)->index;
+                    (((Blank+i)->wordmatch)+j)->possibility = (((Blank+i)->wordmatch)+j+1)->possibility;
                     (Blank+i)->blankPointer -=1;
-                    deleteElement(j,(Blank+i)->wordmatch);
-                //}else{*/
+               }
+                   /* //(Blank+i)->blankPointer -=1;
+                    c = -1;
+                    //deleteElement(j,(Blank+i)->wordmatch);
+                }else{*/
                     if (strlen((((Blank+i)->wordmatch)+j)->match)>0){
                         c = findCharacter((Blank+i)->x,(Blank+i)->y,(Blank+i)->len,r, (((Blank+i)->wordmatch)+j)->match);
                     }
