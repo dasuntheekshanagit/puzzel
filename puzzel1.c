@@ -389,13 +389,17 @@ void increaseProbability(blanks *Blank, int r){
         if (pointer>1){                                                                                               // If there is more than one element continue.
             while (j<pointer){                                                                                        // Iterate until check the all elements.
                 index = (((Blank+i)->wordmatch)+j)->index;                                                            //Get the index of that word in the word list.
-                 if (strlen((((Blank+i)->wordmatch)+j)->match)>0){                                                    // If word is exits in the object continue.
-                    c = findCharacter((Blank+i)->x,(Blank+i)->y,(Blank+i)->len,r, (((Blank+i)->wordmatch)+j)->match); // Get the no of characters matches to that blanks.
+                 if (available[index]==1){                                                                             // If the word is already used delete that from the list.
+                    c = -1;
+                }else{
+                    if (strlen((((Blank+i)->wordmatch)+j)->match)>0){                                                    // If word is exits in the object continue.
+                        c = findCharacter((Blank+i)->x,(Blank+i)->y,(Blank+i)->len,r, (((Blank+i)->wordmatch)+j)->match); // Get the no of characters matches to that blanks.
+                    }
                 }
                 //TODO: Can this statement add to before.
-                if (available[index]==1){                                                                             // If the word is already used delete that from the list.
+                /*if (available[index]==1){                                                                             // If the word is already used delete that from the list.
                     c = -1;
-                }
+                }*/
                 if (c<0){                                                                                             // Delete objects if necessary.
                     pointer -=1;
                     deleteElement(j,(Blank+i)->wordmatch);
@@ -414,7 +418,6 @@ _Bool validate(){
             _Bool : Return 1 if there are invalid character in the grid, else 0.
     */
 
-    //TODO: What if column entered are not equal.
     int len;
     col = strlen(grid[0]);                           // Get the no of columns in the grid
 
@@ -495,7 +498,6 @@ void walkThroughGrid(){
         iterate = col;
     }
 
-    //TODO: What if row and col are not equal?
     for (int i=0;i<iterate;i++){
         for (int j=0;j<col;j++){
             rowsts = checkHash(i,j,rowsts,&rowPointer,&rowBlank[0],'c');
