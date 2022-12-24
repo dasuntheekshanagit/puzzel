@@ -102,8 +102,8 @@ int main(){
             int i = 0;
             while (rowAvalable+colAvalable){
                 //printf("%d\n",rowAvalable+colAvalable);
-                //printGrid();
-                //printBlanks();
+                printGrid();
+                printBlanks();
                 //printf("\n%d\n",i);
                 if (i>15){
                     break;
@@ -391,39 +391,31 @@ _Bool input_validity(char puzzle[],int len){
 
 _Bool increaseProbability(blanks *Blank, int r){
     int c=10;
+    int pointer,j=0,index;
+
     for (int i=0;i<SIZE;i++){
-        int pointer = (Blank+i)->blankPointer;
+        pointer = (Blank+i)->blankPointer;
         if (pointer>1){
-            for (int j=0;j<pointer;j++){
-                int possibility = (((Blank+i)->wordmatch)+j)->possibility;
-                //TODO: If possibility > 90 get that value and stop oteration.
-                int index = (((Blank+i)->wordmatch)+j)->index;
-               if (available[index]==1){
-                    //printf("--%d %s\n",pointer,(((Blank+i)->wordmatch)+j)->match);
-                     //printf("--%d %s\n",pointer,(((Blank+i)->wordmatch)+j+1)->match);
-                     strcpy((((Blank+i)->wordmatch)+j)->match, (((Blank+i)->wordmatch)+j+1)->match);
-                    (((Blank+i)->wordmatch)+j)->index = (((Blank+i)->wordmatch)+j+1)->index;
-                    (((Blank+i)->wordmatch)+j)->possibility = (((Blank+i)->wordmatch)+j+1)->possibility;
-                    (Blank+i)->blankPointer -=1;
-               }
-                   /* //(Blank+i)->blankPointer -=1;
+            while (j<pointer){
+                index = (((Blank+i)->wordmatch)+j)->index;
+                 if (strlen((((Blank+i)->wordmatch)+j)->match)>0){
+                    c = findCharacter((Blank+i)->x,(Blank+i)->y,(Blank+i)->len,r, (((Blank+i)->wordmatch)+j)->match);
+                }
+                if (available[index]==1){
                     c = -1;
-                    //deleteElement(j,(Blank+i)->wordmatch);
-                }else{*/
-                    if (strlen((((Blank+i)->wordmatch)+j)->match)>0){
-                        c = findCharacter((Blank+i)->x,(Blank+i)->y,(Blank+i)->len,r, (((Blank+i)->wordmatch)+j)->match);
-                    }
-                //}
-                //printf("%d %p %d %p\n",c,(Blank+i)->wordmatch,i,(Blank+i)->wordmatch+1);
+                }
                 if (c<0){
                     //printf("before: %d ",(Blank+i)->blankPointer);
-                    (Blank+i)->blankPointer -=1;
+                    pointer -=1;
                     //printf("after: %d ",(Blank+i)->blankPointer);
                     deleteElement(j,(Blank+i)->wordmatch);
                     c = 10;
                     //printf("delete %d \n",(Blank+i)->blankPointer);
                 }
+
+                j++;
             }
+            (Blank+i)->blankPointer = pointer;
         }
     }
     return 1;
