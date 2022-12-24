@@ -51,7 +51,7 @@ _Bool addToGrid(int,int,char*,int,int);            // Used to add the words to g
 _Bool checkToGrid(int,int,char*,int,int);          // Used to check the words can be add grid, if it is add to it.
 _Bool checkHash(int,int,_Bool,int*,blanks *,char); // Used to get length of blanks with its position.
 void deleteElement(int,matchwords*);               // Used to delete an element from the matchword array.
-int findCharacter(int,int,int,int,char*);          // Used to iterate through grid and find any matches is the current blank to words in the list. //TODO: This can be delete and merged with checToGrid
+int findCharacter(int,int,int,int,char*);          // Used to iterate through grid and find any matches is the current blank to words in the list. //NOTE: Merged with checkToGrid
 _Bool fillOnePossible(blanks *,int);               // Used to fill the blanks that have only one possible value.
 void getInput();                                   // Used to get user input as grid and words.
 void getWordLength();                              // Used to find the length of each word in the array.
@@ -147,22 +147,11 @@ _Bool checkToGrid(int x,int y,char match[],int len,int rc){
             the words character that fill to that position return 1, else fill that blank and return 0.
     */
 
-    char check;
+    int c;
 
-    for (int i=0;i<len;i++){
-        if (rc){
-            check = grid[y][x+i]; // Row
-        }else{
-            check = grid[y+i][x]; //Col
-        }
-        if (isalpha(check)){
-            if (check == match[i]){
-                continue;
-            }else{
-                impossible = 100;
-                return 1;
-            }
-        }
+    c = findCharacter(x,y,len,rc,match);
+    if (c==-1){
+        return 1;
     }
     addToGrid(x,y,match,len,rc);
     return 0;
@@ -385,29 +374,26 @@ void increaseProbability(blanks *Blank, int r){
     int pointer,j=0,index;
 
     for (int i=0;i<SIZE;i++){
-        pointer = (Blank+i)->blankPointer;                                                                            // Get the no of elements in the object.
-        if (pointer>1){                                                                                               // If there is more than one element continue.
-            while (j<pointer){                                                                                        // Iterate until check the all elements.
-                index = (((Blank+i)->wordmatch)+j)->index;                                                            //Get the index of that word in the word list.
-                 if (available[index]==1){                                                                             // If the word is already used delete that from the list.
+        pointer = (Blank+i)->blankPointer;                                                                                // Get the no of elements in the object.
+        if (pointer>1){                                                                                                   // If there is more than one element continue.
+            while (j<pointer){                                                                                            // Iterate until check the all elements.
+                index = (((Blank+i)->wordmatch)+j)->index;                                                                //Get the index of that word in the word list.
+                 if (available[index]==1){                                                                                // If the word is already used delete that from the list.
                     c = -1;
                 }else{
-                    if (strlen((((Blank+i)->wordmatch)+j)->match)>0){                                                    // If word is exits in the object continue.
+                    if (strlen((((Blank+i)->wordmatch)+j)->match)>0){                                                     // If word is exits in the object continue.
                         c = findCharacter((Blank+i)->x,(Blank+i)->y,(Blank+i)->len,r, (((Blank+i)->wordmatch)+j)->match); // Get the no of characters matches to that blanks.
                     }
                 }
-                //TODO: Can this statement add to before.
-                /*if (available[index]==1){                                                                             // If the word is already used delete that from the list.
-                    c = -1;
-                }*/
-                if (c<0){                                                                                             // Delete objects if necessary.
+                //NOTE: Add available line before this
+                if (c<0){                                                                                                 // Delete objects if necessary.
                     pointer -=1;
                     deleteElement(j,(Blank+i)->wordmatch);
                     c = 1;
                 }
                 j++;
             }
-            (Blank+i)->blankPointer = pointer;                                                                        // update the no of elements in the array.
+            (Blank+i)->blankPointer = pointer;                                                                            // update the no of elements in the array.
         }
     }
 }
