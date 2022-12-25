@@ -58,6 +58,7 @@ void getWordLength();                              // Used to find the length of
 _Bool input_validity(char *,int);                  // Used to check whether they are characters other than #,* and letters.
 void increaseProbability(blanks*,int);            // Used to if there is any match words in the blank increased and delete unmatched words.
 _Bool matchWords();                                // Used to match the word to blanks by considering there length.
+void moveElement(matchwords*,int);
 void printBlanks();                                // Used to print the row and column blank objects.
 void printGrid();                                  // used to print the grid.
 void printWords();                                 // used to print the word object in the word list.
@@ -88,6 +89,8 @@ int main(){
             increaseProbability(&colBlank[0],0);            // Go through grid and remove words not match in columns.
 
             while (rowAvalable+colAvalable){                // Iterate until fill all the blanks.
+                printGrid();
+                printBlanks();
                 if (i>15){
                     printf("IMPOSSIBLE\n");
                     return 0;                               // If loop tends to infinite loop break it.
@@ -195,8 +198,8 @@ _Bool checkHash(int i,int j,_Bool sts,int *Point,blanks* Blank,char rc){
         }
     }else{
         if (sts){
-            // TODO: Bug: Pointer will jump even if its a start. Not even its end of the blank. It will be at least no of row or columns. Check can this reduced.
-            // Maybe can use a variable like sts.
+            // NOTE: Bug: Pointer will jump even if its a start. Not even its end of the blank. It will be at least no of row or columns. Check can this reduced.
+            // Maybe can use a variable like sts. - wont happened because sts = 0 after pointer increased.
             Pointer++;                                    // Jump the pointer and end the counting blank length when * is founded.
         }
         sts = 0;                                          // Change sts to 0 to indicate blank is not stated.
@@ -216,7 +219,7 @@ void deleteElement(int i,matchwords *arr){
     */
 
     for (int j=i;j<5;j++){
-        //TODO: Find another way to do this.
+        //TODO: Find another way to do this.  pass memory address to memcpy
         //printf("--%s\n",((arr+j)->match));
         strcpy(((arr+j)->match), ((arr+j+1)->match));
         (arr+j)->index = (arr+j+1)->index;
@@ -280,11 +283,16 @@ _Bool fillOnePossible(blanks *Blank,int r){
                         ((Blank+i)->wordmatch)->possibility = 100;                                              // Indicate that blank is filled with best match
                         return 0;                                                                               // If successfully filled that blank without conflict return 0.
                     }
-                    available[index] = 1;                                                                       // Indicated that word is used to filled and no longer available.
-                    rowAvalable-=1;
+                    available[index] = 1;
+                    if (r){
+                        rowAvalable-=1;
+                    } else{
+                        colAvalable -=1;
+                    }                                                                      // Indicated that word is used to filled and no longer available.
+
                 // NOTE: Function changed by changing the checkToGrid.
             }else{
-                //TODO: impossible = 0; is removed. Check whether its affected to further modifications.
+                //NOTE: impossible = 0; is removed. Check whether its affected to further modifications. - didn't find.
             }
         }
     }
@@ -371,7 +379,7 @@ void increaseProbability(blanks *Blank, int r){
     */
 
     int c=1;
-    int pointer,j=0,index;
+    int pointer,j=0,index,nextc=0;
 
     for (int i=0;i<SIZE;i++){
         pointer = (Blank+i)->blankPointer;                                                                                // Get the no of elements in the object.
@@ -383,6 +391,8 @@ void increaseProbability(blanks *Blank, int r){
                 }else{
                     if (strlen((((Blank+i)->wordmatch)+j)->match)>0){                                                     // If word is exits in the object continue.
                         c = findCharacter((Blank+i)->x,(Blank+i)->y,(Blank+i)->len,r, (((Blank+i)->wordmatch)+j)->match); // Get the no of characters matches to that blanks.
+                        (((Blank+i)->wordmatch)+j)->possibility = c;
+
                     }
                 }
                 //NOTE: Add available line before this
@@ -390,6 +400,12 @@ void increaseProbability(blanks *Blank, int r){
                     pointer -=1;
                     deleteElement(j,(Blank+i)->wordmatch);
                     c = 1;
+                }else{
+                    nextc = (((Blank+i)->wordmatch)+j+1)->possibility;
+                    if ((c>nextc)& (nextc>=0)){
+                            printf("posibility: %d x:%d y:%d text:%s\n",c,(Blank+i)->x,(Blank+i)->y, (((Blank+i)->wordmatch)+j)->match);
+                            moveElement((((Blank+i)->wordmatch)+j),j);
+                    }
                 }
                 j++;
             }
@@ -528,4 +544,27 @@ _Bool matchWords(){
         return 0;
     }
     return 1;
+}
+
+void moveElement(matchwords arr[],int i){
+    /*
+        Input:
+            i: Index of element to delete.
+            *arr: Memory address of the matchwords arr to delete an element.
+        Function:
+            Delete an element by replace an element by copying next element to that position.
+    */
+
+    //for (int j=i;j<5;j++){
+        //printf("--%s\n",((arr+j)->match));
+    matchwords temp;
+
+    memcpy(&temp,&arr[i],sizeof(temp));
+    memcpy(&arr[i],&arr[i+1],sizeof(temp));
+    memcpy(&arr[i],&temp,sizeof(temp));
+        //strcpy(((arr+j)->match), ((arr+j+1)->match));
+        //(arr+j)->index = (arr+j+1)->index;
+        //(arr+j)->possibility = (arr+j+1)->possibility;
+    //}
+    return;
 }
