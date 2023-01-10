@@ -4,7 +4,7 @@
 
 #define SIZE 256
 
-char grid[SIZE][SIZE]={0},word[SIZE][SIZE]={0};                                          // Store the Puzzele Grid and Words in 2D array
+char grid[SIZE][SIZE]={0},word[SIZE][SIZE]={0};                                          // Store the Puzzle Grid and Words in 2D array
 int row,col,wordcount,rowPointer=0,colPointer=0,colAvalable=0,rowAvalable=0,impossible=0;
 _Bool available[SIZE];                                                                   // To track a word is available of used to fill the grid
 
@@ -47,16 +47,16 @@ words wordList[SIZE];  // word array. This is used to store words that have simi
 blanks rowBlank[SIZE]; // blanks array. This is used to store row blanks with its details.
 blanks colBlank[SIZE]; // blanks array. This is used to store column blanks with its details.
 
-_Bool addToGridCol(int,int,char*,int);             // Used to add the words to grid column wise.
-_Bool addToGridRow(int,int,char*,int);             // Used to add the words to grid row wise.
+_Bool addToGrid(int,int,char*,int,int);            // Used to add the words to grid.
+_Bool checkToGrid(int,int,char*,int,int);          // Used to check the words can be add grid, if it is add to it.
 _Bool checkHash(int,int,_Bool,int*,blanks *,char); // Used to get length of blanks with its position.
-void deleteElement(int,matchwords*);
-int findCharacter(int,int,int,int,char*);
+void deleteElement(int,matchwords*);               // Used to delete an element from the matchword array.
+int findCharacter(int,int,int,int,char*);          // Used to iterate through grid and find any matches is the current blank to words in the list. //TODO: This can be delete and merged with checToGrid
 _Bool fillOnePossible(blanks *,int);               // Used to fill the blanks that have only one possible value.
 void getInput();                                   // Used to get user input as grid and words.
 void getWordLength();                              // Used to find the length of each word in the array.
 _Bool input_validity(char *,int);                  // Used to check whether they are characters other than #,* and letters.
-_Bool increaseProbability(blanks*,int);
+_Bool increaseProbability(blanks*,int);            // Used to if there is any match words in the blank increased and delete unmatched words.
 _Bool matchWords();                                // Used to match the word to blanks by considering there length.
 void printBlanks();                                // Used to print the row and column blank objects.
 void printGrid();                                  // used to print the grid.
@@ -76,7 +76,7 @@ int main(){
         walkThroughGrid();
         //printBlanks();
         if(matchWords()){
-            //printBlanks();
+             //printBlanks();
             _Bool y = fillOnePossible(&rowBlank[0],1);
             _Bool x = fillOnePossible(&colBlank[0],0);
             if (!((impossible>0) & x & y)){                 // Check whether grid can fill or not.
@@ -89,13 +89,23 @@ int main(){
             /*if ((rowAvalable+colAvalable)<1){
                     return 0;
             }*/
+            //printGrid();
+            //printBlanks();
+            //printf("fil\n");
             increaseProbability(&rowBlank[0],1);
+            //printBlanks();
+            //printf("row\n");
             increaseProbability(&colBlank[0],0);
+            //printGrid();
+            //printBlanks();
+            //printf("prob--\n");
             int i = 0;
             while (rowAvalable+colAvalable){
+                //printf("%d\n",rowAvalable+colAvalable);
                 printGrid();
-                printf("\n");
-                if (i>10){
+                printBlanks();
+                //printf("\n%d\n",i);
+                if (i>15){
                     break;
                 }
                 _Bool y = fillOnePossible(&rowBlank[0],1);
@@ -105,72 +115,73 @@ int main(){
                 i++;
             }
             printGrid();
+            printf("%d %d\n",i,rowAvalable+colAvalable);
         }
     }
     return 0;
 }
 
 //TODO: both functions can merge with rc value.
-_Bool addToGridCol(int x,int y,char match[],int len){
+_Bool addToGrid(int x,int y,char match[],int len,int rc){
     /*
         Input:
             x    : column no.
             y    : row no.
             match: word add to grid to fill.
             len  : length of the word.
+            rc   : column or row.
         Output:
             bool : Possible to fill or not.
         Function:
-            Fill the grid by going column wise.if there is a letter already in the grid and its not match with
-            the words character that fill to that position return 1, else return 1.
+            Fill the grid by going column wise or row wise.
     */
-    //printf("%d %d %d %s\n",x,y,len,match);
+
+    char check;
+
     for (int i=0;i<len;i++){
-        //printf("%c-%d ",grid[y+i][x],i);
-        if (isalpha(grid[y+i][x])){
-            if (grid[y+i][x] == match[i]){
-                continue;
-            }else{
-                //printf("----%c %c-----\n",grid[y+i][x],match[i]);
-                impossible = 100;
-                return 1;
-            }
+        if (rc){
+            grid[y][x+i] = match[i]; // Row
+        }else{
+            grid[y+i][x] = match[i]; // Col
         }
-        grid[y+i][x] = match[i];
+
     }
-    //printf("\n");
     return 0;
 }
 
-_Bool addToGridRow(int x,int y,char match[],int len){
+_Bool checkToGrid(int x,int y,char match[],int len,int rc){
     /*
         Input:
             x    : column no.
             y    : row no.
             match: word add to grid to fill.
             len  : length of the word.
+            rc   : column or row.
         Output:
             bool : Possible to fill or not.
         Function:
-            Fill the grid by going row wise.if there is a letter already in the grid and its not match with
-            the words character that fill to that position return 1, else return 1.
+            Check the grid by going row wise or column wise.if there is a letter already in the grid and its not match with
+            the words character that fill to that position return 1, else fill that blank and return 0.
     */
-    //printf("%d %d %d %s\n",x,y,len,match);
+
+    char check;
+
     for (int i=0;i<len;i++){
-        //printf("%c-%d ",grid[y][x+i],i);
-        if (isalpha(grid[y][x+i])){
-            if (grid[y][x+i] == match[i]){
+        if (rc){
+            check = grid[y][x+i]; // Row
+        }else{
+            check = grid[y+i][x]; //Col
+        }
+        if (isalpha(check)){
+            if (check == match[i]){
                 continue;
             }else{
-                //printf("oihhgg\n");
                 impossible = 100;
                 return 1;
             }
         }
-
-        grid[y][x+i] = match[i];
     }
-    //printf("\n");
+    addToGrid(x,y,match,len,rc);
     return 0;
 }
 
@@ -201,13 +212,12 @@ _Bool checkHash(int i,int j,_Bool sts,int *Point,blanks* Blank,char rc){
             sts = 1;
         }
 
-        // TODO: Check col or row when they are not equal.
-        // TODO: check r and c are correct.
-        if (((j+1)== row) & (rc == 'c')) {               // Check whether is it the last position of the row.
+        // NOTE: Corrected the row and col by changing them. when a row end should be col.
+        if (((j+1)== col) & (rc == 'c')) {               // Check whether is it the last position of the row.
             sts = 0;
             Pointer++;                                   // If it is move the pointer to next position and break the counting.
         }
-        if (((i+1)== col) & (rc == 'r')) {               // Check whether is it the last position of the col.
+        if (((i+1)== row) & (rc == 'r')) {               // Check whether is it the last position of the col.
             sts = 0;
             Pointer++;                                   // If it is move the pointer to next position and break the counting.
         }
@@ -225,8 +235,17 @@ _Bool checkHash(int i,int j,_Bool sts,int *Point,blanks* Blank,char rc){
 
 
 void deleteElement(int i,matchwords *arr){
+    /*
+        Input:
+            i: Index of element to delete.
+            *arr: Memory address of the matchwords arr to delete an element.
+        Function:
+            Delete an element by replace an element by copying next element to that position.
+    */
+
     for (int j=i;j<5;j++){
         //TODO: Find another way to do this.
+        //printf("--%s\n",((arr+j)->match));
         strcpy(((arr+j)->match), ((arr+j+1)->match));
         (arr+j)->index = (arr+j+1)->index;
         (arr+j)->possibility = (arr+j+1)->possibility;
@@ -235,6 +254,19 @@ void deleteElement(int i,matchwords *arr){
 }
 
 int findCharacter(int x,int y,int len,int rc,char text[]){
+    /*
+        Input:
+            x: row no.
+            y: col no.
+            len: length of the words
+            rc: column or row. if row, rc is 1.
+            text: text to find if there any characters in the grid.
+        Output:
+            int: if text do not match return -1, else return no of match character by returning possibility.
+        Function:
+            Iterate through the grid and find the matching characters to the text.
+    */
+
     char c;
     int possibility=0;
 
@@ -244,7 +276,6 @@ int findCharacter(int x,int y,int len,int rc,char text[]){
         }else{
             c = grid[y+i][x];
         }
-        //printf("%c-% c",c,text[i]);
         if (isalpha(c)){
             if (c==text[i]){
                 possibility += (100/len);
@@ -269,28 +300,17 @@ _Bool fillOnePossible(blanks *Blank,int r){
 
     int index;
     for (int i=0;i<SIZE;i++){
-        impossible = impossible+(Blank+i)->blankPointer;                    // Sum the available possibilities to fill the grid. If there is no
-        if ((Blank+i)->blankPointer == 1){                                // matches for the hole grid this will be 0.
-            index = ((Blank+i)->wordmatch)->index;                        // If there is only one match
-            if (available[index] == 0){                                   // and that word is not used by other blank to fill
-                if (r == 1){                                              // fill that word in the blank for the grid.
-                    if (addToGridRow((Blank+i)->x,(Blank+i)->y,((Blank+i)->wordmatch)->match,(Blank+i)->len)){
-                        ((Blank+i)->wordmatch)->possibility = 100;        // Indicate that blank is filled with best match
-                        return 0;                                         // If successfully filled that blank without conflict return 0.
+        impossible = impossible+(Blank+i)->blankPointer;                                                        // Sum the available possibilities to fill the grid. If there is no
+        if ((Blank+i)->blankPointer == 1){                                                                      // matches for the hole grid this will be 0.
+            index = ((Blank+i)->wordmatch)->index;                                                              // If there is only one match
+            if (available[index] == 0){                                                                         // and that word is not used by other blank to fill
+                    if (checkToGrid((Blank+i)->x,(Blank+i)->y,((Blank+i)->wordmatch)->match,(Blank+i)->len,r)){ // fill that word in the blank for the grid.
+                        ((Blank+i)->wordmatch)->possibility = 100;                                              // Indicate that blank is filled with best match
+                        return 0;                                                                               // If successfully filled that blank without conflict return 0.
                     }
-                    available[index] = 1;
+                    available[index] = 1;                                                                       // Indicated that word is used to filled and no longer available.
                     rowAvalable-=1;
-                    //printf("--%d\n",rowAvalable);                             // Indicated that word is used to filled and no longer available.
-                }else{
-                    if (addToGridCol((Blank+i)->x,(Blank+i)->y,((Blank+i)->wordmatch)->match,(Blank+i)->len)){
-                        ((Blank+i)->wordmatch)->possibility = 100;
-                        return 0;
-                    }
-                    available[index] = 1;
-                    colAvalable-=1;
-                    //printf("--%d\n",rowAvalable);
-                }
-                // Note: Tow lines are moved to 212-213 and 218-219.
+                // NOTE: Function changed by changing the checkToGrid.
             }else{
                 //TODO: impossible = 0; is removed. Check whether its affected to further modifications.
             }
@@ -340,6 +360,7 @@ void getWordLength(){
         int len = strlen(word[i]);                                // get length
         int point = (wordList+len)->pointer;
         (wordList+len)->pointer = point + 1;                      // Increase the pointer always when adding a new word.
+        //printf("%d\n",(wordList+len)->pointer);  //Note: Word pointer
         strcpy(((wordList+len)->wordlist[point]).match,word[i]);
         ((wordList+len)->wordlist[point]).index = i;              // Store the index of the word in the matchword object.
     }
@@ -369,19 +390,32 @@ _Bool input_validity(char puzzle[],int len){
 }
 
 _Bool increaseProbability(blanks *Blank, int r){
+    int c=10;
+    int pointer,j=0,index;
+
     for (int i=0;i<SIZE;i++){
-        int pointer = (Blank+i)->blankPointer;
+        pointer = (Blank+i)->blankPointer;
         if (pointer>1){
-            for (int j=0;j<pointer;j++){
-                int possibility = (((Blank+i)->wordmatch)+j)->possibility;
-                //TODO: If possibility > 90 get that value and stop oteration.
-                int c = findCharacter((Blank+i)->x,(Blank+i)->y,(Blank+i)->len,r, (((Blank+i)->wordmatch)+j)->match);
-                //printf("%d %p %d %p\n",c,(Blank+i)->wordmatch,i,(Blank+i)->wordmatch+1);
-                if (c<0){
-                    (Blank+i)->blankPointer -=1;
-                    deleteElement(j,(Blank+i)->wordmatch);
+            while (j<pointer){
+                index = (((Blank+i)->wordmatch)+j)->index;
+                 if (strlen((((Blank+i)->wordmatch)+j)->match)>0){
+                    c = findCharacter((Blank+i)->x,(Blank+i)->y,(Blank+i)->len,r, (((Blank+i)->wordmatch)+j)->match);
                 }
+                if (available[index]==1){
+                    c = -1;
+                }
+                if (c<0){
+                    //printf("before: %d ",(Blank+i)->blankPointer);
+                    pointer -=1;
+                    //printf("after: %d ",(Blank+i)->blankPointer);
+                    deleteElement(j,(Blank+i)->wordmatch);
+                    c = 10;
+                    //printf("delete %d \n",(Blank+i)->blankPointer);
+                }
+
+                j++;
             }
+            (Blank+i)->blankPointer = pointer;
         }
     }
     return 1;
@@ -436,7 +470,7 @@ void printBlanks(){
     */
 
     int i;
-    for (i=0;i<10;i++){                                           // Note: 10 is just to get first 10 elements. Its can be changed.
+    for (i=0;i<20;i++){                                           // Note: 10 is just to get first 10 elements. Its can be changed.
         //printf("x: %d y:%d len:%d pointer:%d\n",(colBlank+i)->x,(colBlank+i)->y,(colBlank+i)->len,(colBlank+i)->blankPointer);
         printf("x: %d y:%d len:%d pointer:%d\n",(rowBlank+i)->x,(rowBlank+i)->y,(rowBlank+i)->len,(rowBlank+i)->blankPointer);
     }
@@ -465,10 +499,17 @@ void walkThroughGrid(){
             Iterate through grid and get the length of blanks and their position.
     */
 
-    _Bool rowsts = 0,colsts=0;                                          // Store the status of the function return.
+    _Bool rowsts = 0,colsts=0;                         // Store the status of the function return.
+    int iterate;
+
+    if (row>=col){
+        iterate = row;
+    }else{
+        iterate = col;
+    }
 
     //TODO: What if row and col are not equal?
-    for (int i=0;i<row;i++){
+    for (int i=0;i<iterate;i++){
         for (int j=0;j<col;j++){
             rowsts = checkHash(i,j,rowsts,&rowPointer,&rowBlank[0],'c');
             colsts = checkHash(j,i,colsts,&colPointer,&colBlank[0],'r');
@@ -480,39 +521,28 @@ void walkThroughGrid(){
 _Bool matchWords(){
     int limit;
 
-    if (rowPointer>colPointer){
+    if (rowPointer>colPointer){  // If col > row get col as maximum and iterate, else get row
         limit = rowPointer;
     }else{
         limit = colPointer;
     }
 
-    for (int i=0;i<limit;i++){
-        int rowlen = (rowBlank+i)->len,j;
+    for (int i=0;i<limit;i++){          // Iterate through blanks lisit
+        int rowlen = (rowBlank+i)->len,j;    // Get word length
         int collen = (colBlank+i)->len;
-        //printf("row:%d col:%d\n",rowlen,collen);
+
         if (rowlen>1){
-            rowAvalable++;
-            //for (j=0;j<(wordList+rowlen)->pointer;j++){
-                //printf("%d %s %d\n",rowlen,(wordList+rowlen)->wordlist[j],j);
-                //strcpy(((rowBlank+i)->wordmatch[j]).match,(wordList+rowlen)->wordlist[j]);
+            rowAvalable++;      // Fill the blanks with available same length words
             memcpy((rowBlank+i)->wordmatch,(wordList+rowlen)->wordlist,sizeof((wordList+rowlen)->wordlist));
-            //}
             (rowBlank+i)->blankPointer = (wordList+rowlen)->pointer;
-            //printf("%d\n",(rowBlank+i)->balnkPointer);
         }
         if (collen>1){
             colAvalable++;
-            //for (j=0;j<(wordList+collen)->pointer;j++){
-                //printf("%d %s %d\n",collen,(wordList+collen)->wordlist[j],j);
-                //strcpy(((colBlank+i)->wordmatch[j]).match,(wordList+collen)->wordlist[j]);
             memcpy((colBlank+i)->wordmatch,(wordList+collen)->wordlist,sizeof((wordList+rowlen)->wordlist));
-            //}
             (colBlank+i)->blankPointer =(wordList+collen)->pointer;
-            //printf("%d\n",(colBlank+i)->balnkPointer);
         }
     }
 
-    //printf("%d %d %d\n",rowAvalable,colAvalable,wordcount);
     if ((rowAvalable+colAvalable) < wordcount){
         printf("IMPOSSIBLE\n");
         return 0;
