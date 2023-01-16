@@ -5,7 +5,7 @@
 
 #define SIZE 256
 
-char *grid,word[SIZE][SIZE]={0};                                          // Store the Puzzle Grid and Words in 2D array
+char *grid,*word;                                          // Store the Puzzle Grid and Words in 2D array
 int size=0,row,col,wordcount,rowPointer=0,colPointer=0,colAvalable=0,rowAvalable=0,impossible=0;
 _Bool available[SIZE];                                                                   // To track a word is available of used to fill the grid
 
@@ -56,7 +56,6 @@ int findCharacter(int,int,int,int,char*);          // Used to iterate through gr
 _Bool fillOnePossible(blanks *,int);               // Used to fill the blanks that have only one possible value.
 void getInput();                                   // Used to get user input as grid and words.
 void getWordLength();                              // Used to find the length of each word in the array.
-_Bool input_validity(char *,int);                  // Used to check whether they are characters other than #,* and letters.
 void increaseProbability(blanks*,int);            // Used to if there is any match words in the blank increased and delete unmatched words.
 _Bool matchWords();                                // Used to match the word to blanks by considering there length.
 void printBlanks();                                // Used to print the row and column blank objects.
@@ -71,9 +70,16 @@ int main(){
 
     */
 
-    int i = 0;
+    //int i = 0;
     getInput();                                             // Get user input.
     printGrid();
+
+    /*for (int i=0;i<wordcount;i++){
+        for (int j=0;j<col;j++)
+            printf("%c",*(word+i+j));
+        printf("\n");
+    }*/
+    validate();
     /*if (validate()){                                        // Validate User Input.
         getWordLength();                                    // Get length of each words.
         walkThroughGrid();                                  // Find the positions of blanks.
@@ -321,12 +327,26 @@ void getInput(){
 
     pointer = 0;
 
-    /*while (scanf("%[^\n]%*c",line) != 0){
-        strcpy(word[pointer],line);
+    while (scanf("%[^\n]%*c",line) != 0){
+        int len;
+        if (pointer == 0){
+            wordcount = 1;
+            if (row > col){
+                len = row;
+            }else{
+                len = col;
+            }
+            word = (char*)malloc(len*sizeof(char));
+        }else{
+            wordcount++;
+            word = realloc(word,len*wordcount);
+        }
+        //strcpy(word[pointer],line);
+        memcpy(word+pointer*len,line,sizeof(char)*len);    // Copy user input string to grid.
         pointer++;
     }
 
-    wordcount = pointer;                                 // Get no of words.*/
+    //wordcount = pointer;                                 // Get no of words.*/
 
     return ;
 }
@@ -350,29 +370,9 @@ void getInput(){
     }
     return;
 }
+*/
 
-_Bool input_validity(char puzzle[],int len){
-    /*
-        Input:
-            puzzle: word to check
-            len   : length of the word
-        OutPut:
-            _Bool : If valid input return 1, else 0.
-        Function:
-            Iterate through grid and check whether it contain invalid character other than #,* and letters.
-    */
-
-   /* for(int j=0;j<len;j++){
-            if (isalpha(puzzle[j]) || puzzle[j]=='#' || puzzle[j] == '*' ){
-                continue;
-            }
-            else{
-                return 0;
-            }
-            }
-        return 1;
-}
-
+/*
 void increaseProbability(blanks *Blank, int r){
     /*
         Input:
@@ -409,33 +409,27 @@ void increaseProbability(blanks *Blank, int r){
         }
     }
 }
-
+*/
 _Bool validate(){
     /*
         Output:
             _Bool : Return 1 if there are invalid character in the grid, else 0.
     */
 
-   /* int len;
-    col = strlen(grid[0]);                           // Get the no of columns in the grid
-
-    do{
-        len = strlen(grid[row]);
-        _Bool sts = input_validity(grid[row],len);   // Check the validity of the row.
-        if (!sts){
-            printf("INVALID INPUT\n");               // If invalid row, indicate and break.
-            return sts;
-        }
-
-        row++;
-    }
-    while (len > 0);                                 // Iterate until end of the row.
-
-    row--;                                           // Row no is increase than one.So decreased it.
-
+	 for (int i=0;i<row;i++){
+        for (int j=0;j<col;j++){
+			if (isalpha(grid[i*col+j]) || grid[i*col+j]=='#' || grid[i*col+j] == '*' ){
+                continue;
+            }
+            else{
+				printf("INVALID INPUT\n"); 
+                return 0;
+            }
+		}
+	}
     return 1;
 }
-*/
+
 void printGrid(){
     /*
         Function:
