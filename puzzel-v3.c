@@ -310,13 +310,15 @@ void getInput(){
             size += col;
             grid = realloc(grid,size);
         }
-        //strcat(grid+(pointer*col),line);                       // Copy user input string to grid.
-        memcpy(grid+pointer*col,line,sizeof(char)*col);
+
+        memcpy(grid+pointer*col,line,sizeof(char)*col);    // Copy user input string to grid.
         pointer++;                                        // Increase the pointer to store next line.
     }
 
     scanf("%*c",line);                                    // Get new line
+
     row = pointer;
+
     pointer = 0;
 
     /*while (scanf("%[^\n]%*c",line) != 0){
