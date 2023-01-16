@@ -6,7 +6,7 @@
 #define SIZE 256
 
 char *grid,*word;                                          // Store the Puzzle Grid and Words in 2D array
-int size=0,row,col,wordcount,rowPointer=0,colPointer=0,colAvalable=0,rowAvalable=0,impossible=0;
+int size=0,row,col,wordcount,rowPointer=0,colPointer=0,colAvalable=0,rowAvalable=0,impossible=0,len;
 _Bool available[SIZE];                                                                   // To track a word is available of used to fill the grid
 
 
@@ -44,7 +44,7 @@ typedef struct __{
     matchwords wordmatch[SIZE];
 }blanks;
 
-words wordList[SIZE];  // word array. This is used to store words that have similar length. Position of the object is equal tot the length of the word.
+words *wordList;  // word array. This is used to store words that have similar length. Position of the object is equal tot the length of the word.
 blanks rowBlank[SIZE]; // blanks array. This is used to store row blanks with its details.
 blanks colBlank[SIZE]; // blanks array. This is used to store column blanks with its details.
 
@@ -63,6 +63,7 @@ void printGrid();                                  // used to print the grid.
 void printWords();                                 // used to print the word object in the word list.
 _Bool validate();                                  // Used to validate user input.
 void walkThroughGrid();                            // Used to go through the grid and find the blanks.
+int length(int);
 
 int main(){
     /*
@@ -72,17 +73,13 @@ int main(){
 
     //int i = 0;
     getInput();                                             // Get user input.
-    printGrid();
-
-    /*for (int i=0;i<wordcount;i++){
-        for (int j=0;j<col;j++)
-            printf("%c",*(word+i+j));
-        printf("\n");
-    }*/
-    validate();
-    /*if (validate()){                                        // Validate User Input.
-        getWordLength();                                    // Get length of each words.
-        walkThroughGrid();                                  // Find the positions of blanks.
+    //printGrid();
+	
+    if (validate()){                                        // Validate User Input.
+        wordList = (words*)malloc(sizeof(words)*wordcount);
+		//length(0);
+		getWordLength();                                    // Get length of each words.
+        /*walkThroughGrid();                                  // Find the positions of blanks.
 
         if(matchWords()){                                   // Match the words with blanks length.
             _Bool y = fillOnePossible(&rowBlank[0],1);      // Fill rows which have only one solution.
@@ -107,8 +104,8 @@ int main(){
                 i++;
             }
             printGrid();                                   // Print the grid
-        }
-    }*/
+        }*/
+    }
     return 0;
 }
 
@@ -328,13 +325,12 @@ void getInput(){
     pointer = 0;
 
     while (scanf("%[^\n]%*c",line) != 0){
-        int len;
         if (pointer == 0){
             wordcount = 1;
             if (row > col){
-                len = row;
+                len = row+1;
             }else{
-                len = col;
+                len = col+1;
             }
             word = (char*)malloc(len*sizeof(char));
         }else{
@@ -342,7 +338,7 @@ void getInput(){
             word = realloc(word,len*wordcount);
         }
         //strcpy(word[pointer],line);
-        memcpy(word+pointer*len,line,sizeof(char)*len);    // Copy user input string to grid.
+        strcpy(word+pointer*len,line);    // Copy user input string to grid.
         pointer++;
     }
 
@@ -351,7 +347,7 @@ void getInput(){
     return ;
 }
 
-/*void getWordLength(){
+void getWordLength(){
     /*
         Function:
             Iterate trough the word list and get length of words. The words have same length are stored in words type array with
@@ -360,17 +356,18 @@ void getInput(){
             wordlist = [0:[],0:[],0:[],2:['cat',''dog'],1:['fish']]
     */
 
-    /*for (int i=0;i<wordcount;i++){                                // Iterate all words
-        int len = strlen(word[i]);                                // get length
-        int point = (wordList+len)->pointer;
+   for (int i=0;i<wordcount;i++){                                // Iterate all words
+        int leng = length(i);//strlen(word+i*col);                                // get length
+		printf("%d\n",leng);
+        /*int point = (wordList+len)->pointer;
         (wordList+len)->pointer = point + 1;                      // Increase the pointer always when adding a new word.
         //printf("%d\n",(wordList+len)->pointer);  //Note: Word pointer
         strcpy(((wordList+len)->wordlist[point]).match,word[i]);
-        ((wordList+len)->wordlist[point]).index = i;              // Store the index of the word in the matchword object.
+        ((wordList+len)->wordlist[point]).index = i;              // Store the index of the word in the matchword object.*/
     }
     return;
 }
-*/
+
 
 /*
 void increaseProbability(blanks *Blank, int r){
@@ -535,3 +532,17 @@ void walkThroughGrid(){
     }
     return 1;
 }*/
+
+int length(int i){
+	int j=0;
+	char c;
+	
+	do{
+			
+		c = *(word+i*len+j);
+			
+		j++;
+	}while(c!='\0');
+		
+	return j-1;
+}
