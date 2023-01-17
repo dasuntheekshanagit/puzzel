@@ -2,9 +2,9 @@
 #include <string.h>
 #include <math.h>
 #include <stdlib.h>
-char grid[4][5] = {"*###","*#**","*#**","*#**"};
+char grid[4][5] = {"*#**","####","*#**","****"};
 
-char words[5][5] ={"CARS","CAT"};
+char words[4][4] ={"FLY","GLUE"};
 int placed[20];
 int num_of_words;
 
