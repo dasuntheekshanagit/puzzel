@@ -568,7 +568,7 @@ typedef struct ___{
     char match[SIZE];
     int index;
     int possibility;
-}matchwords;
+}matchwords; 
 
 typedef struct _{
     /*
