@@ -73,12 +73,10 @@ int main(){
 
     //int i = 0;
     getInput();                                             // Get user input.
-    //printGrid();
 	
     if (validate()){                                        // Validate User Input.
 		printf("%d\n",len);
         wordList = (words*)malloc(sizeof(words)*len);
-		//length(0);
 		getWordLength();                                    // Get length of each words.
         walkThroughGrid();                                  // Find the positions of blanks.
 
