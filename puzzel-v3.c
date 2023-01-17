@@ -76,12 +76,13 @@ int main(){
     //printGrid();
 	
     if (validate()){                                        // Validate User Input.
-        wordList = (words*)malloc(sizeof(words)*wordcount);
+		printf("%d\n",len);
+        wordList = (words*)malloc(sizeof(words)*len);
 		//length(0);
 		getWordLength();                                    // Get length of each words.
-        /*walkThroughGrid();                                  // Find the positions of blanks.
+        walkThroughGrid();                                  // Find the positions of blanks.
 
-        if(matchWords()){                                   // Match the words with blanks length.
+        /*if(matchWords()){                                   // Match the words with blanks length.
             _Bool y = fillOnePossible(&rowBlank[0],1);      // Fill rows which have only one solution.
             _Bool x = fillOnePossible(&colBlank[0],0);      // Fill columns which have only one solution.
             if (!((impossible>0) & x & y)){                 // Check whether grid can fill or not.
@@ -105,6 +106,13 @@ int main(){
             }
             printGrid();                                   // Print the grid
         }*/
+
+        free(wordList);
+		wordList = 0;
+		free(grid);
+		grid = 0;
+		free(word);
+		word = 0;
     }
     return 0;
 }
@@ -161,7 +169,7 @@ _Bool checkToGrid(int x,int y,char match[],int len,int rc){
     addToGrid(x,y,match,len,rc);
     return 0;
 }
-
+*/
 _Bool checkHash(int i,int j,_Bool sts,int *Point,blanks* Blank,char rc){
     /*
         Input:
@@ -178,8 +186,8 @@ _Bool checkHash(int i,int j,_Bool sts,int *Point,blanks* Blank,char rc){
             count the length of the blank and store it with the position of it it blanks arrays.
     */
 
-    /*int Pointer = *Point;
-    if (grid[i][j] == '#' | isalpha(grid[i][j])){
+    int Pointer = *Point;
+    if (*(grid+i*col+j) == '#' | isalpha(*(grid+i*col+j))){
         if (sts){
             (Blank+Pointer)->len = (Blank+Pointer)->len + 1;  // If this blanks is not the first blank in space continue countinue.
         }else{
@@ -210,7 +218,7 @@ _Bool checkHash(int i,int j,_Bool sts,int *Point,blanks* Blank,char rc){
     return sts;
 }
 
-
+/*
 void deleteElement(int i,matchwords *arr){
     /*
         Input:
@@ -342,7 +350,7 @@ void getInput(){
         pointer++;
     }
 
-    //wordcount = pointer;                                 // Get no of words.*/
+    wordcount = pointer;                                 // Get no of words.*/
 
     return ;
 }
@@ -358,12 +366,18 @@ void getWordLength(){
 
    for (int i=0;i<wordcount;i++){                                // Iterate all words
         int leng = length(i);//strlen(word+i*col);                                // get length
-		printf("%d\n",leng);
-        /*int point = (wordList+len)->pointer;
-        (wordList+len)->pointer = point + 1;                      // Increase the pointer always when adding a new word.
-        //printf("%d\n",(wordList+len)->pointer);  //Note: Word pointer
-        strcpy(((wordList+len)->wordlist[point]).match,word[i]);
-        ((wordList+len)->wordlist[point]).index = i;              // Store the index of the word in the matchword object.*/
+		//printf("%d\n",leng);
+		if (len>=leng){
+			int point = (wordList+leng)->pointer;
+			(wordList+leng)->pointer = point + 1;                      // Increase the pointer always when adding a new word.
+			printf("%d\n",(wordList+leng)->pointer);  //Note: Word pointer
+			strcpy(((wordList+leng)->wordlist[point]).match,(word+i));
+			(wordList+leng)->wordlist[point].index = i;              // Store the index of the word in the matchword object.*/
+		}else{
+			printf("IMPOSSIBLE\n");
+			//TODO: Check othere imporisble case wich compare length
+			exit(0);
+		}
     }
     return;
 }
@@ -471,14 +485,14 @@ void printWords(){
     }
     return;
 }
-
+*/
 void walkThroughGrid(){
     /*
         Function:
             Iterate through grid and get the length of blanks and their position.
     */
 
-    /*_Bool rowsts = 0,colsts=0;                         // Store the status of the function return.
+    _Bool rowsts = 0,colsts=0;                         // Store the status of the function return.
     int iterate;
 
     if (row>=col){
@@ -494,7 +508,7 @@ void walkThroughGrid(){
         }
     }
     return;
-}*/
+}
 
 /*_Bool matchWords(){*/
     /*
